@@ -1,0 +1,41 @@
+\section{Practical Considerations in Reinforcement Learning}
+
+\paragraph{No Clear Separation Between Training and Testing.}
+In many Reinforcement Learning (RL) scenarios, the agent continues to interact with the \emph{same} environment while it is learning. Consequently, there is no strict boundary between a ``training phase'' and a ``testing phase'' as one might see in supervised learning. Instead, the agent collects data (state transitions, rewards) \emph{while} it is acting. If we do want to distinguish training from testing in RL, we may do so by:
+\begin{itemize}
+    \item \textbf{Stopping Learning:} The agent may freeze its policy or its value function parameters after a certain point and then evaluate performance.
+    \item \textbf{Using a Separate Environment:} If possible, the agent can copy or simulate the environment for training and then switch to a real (or different) environment for testing. However, this is not always feasible or realistic.
+\end{itemize}
+
+\paragraph{Challenges in Non-Stationary Environments.}
+A more challenging scenario arises when the environment itself changes over time (i.e., it is \emph{non-stationary}). In such cases:
+\begin{itemize}
+    \item The transition probabilities $p(s' \mid s, a)$ may shift or drift over time, invalidating assumptions that were true at the beginning of training.
+    \item The policy or value function must adapt continuously, often requiring methods that can track these changes (e.g., by placing higher weight on more recent samples).
+    \item Simple sample-based methods, like LSTD, may need modifications to account for non-stationary data, such as resetting estimates, using a sliding window of samples, or incorporating explicit forgetting factors.
+\end{itemize}
+
+\paragraph{Different but Similar Environments.}
+Even when the environment changes, it might still share certain similarities (e.g., common dynamics, partial overlap in states, or similar reward structures). In these cases, transfer learning or meta-RL techniques can help the agent quickly adapt to the modified environment using knowledge acquired previously.
+
+\paragraph{Tabular Setting as a Special Case of Function Approximation.}
+In a \emph{tabular} RL setting, each state $s$ has a corresponding entry in a table for its value $V(s)$ or action-value $Q(s,a)$. This can be viewed as a special case of linear function approximation where:
+\[
+f(s) \;=\; e_s,
+\]
+and $e_s$ is a \emph{one-hot} (or indicator) vector with $1$ in the position corresponding to state $s$ and $0$ elsewhere. Therefore:
+\begin{itemize}
+    \item The dimension of $f(s)$ equals the total number of states in the environment.
+    \item The matrix $X$ and vector $y$ reduce to their tabular counterparts, often seen in standard DP or TD methods.
+    \item LSTD in the tabular case is essentially the same as solving a system of linear equations to find exact state-value estimates (assuming we sample enough transitions to build these equations).
+\end{itemize}
+
+\paragraph{Summary.}
+\begin{itemize}
+    \item LSTD (and related algorithms) aim to solve the TD fixed-point equation using sample-based estimates of $X$ and $y$.
+    \item In RL, we typically do not have a separate, static training set vs.\ testing set. Instead, the agent continuously learns in the environment.
+    \item Non-stationary or evolving environments introduce additional challenges that require adaptive or robust methods.
+    \item The tabular setting can be seen as a simple, exact form of function approximation where the feature vector is an indicator for each state.
+\end{itemize}
+
+

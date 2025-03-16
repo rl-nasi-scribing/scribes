@@ -1,0 +1,66 @@
+\section{Tabular Representation as One-Hot Encoding}
+
+As noted earlier, the tabular setting can be interpreted as a special case of linear function approximation where the feature vector $f(s)$ is \emph{one-hot} (or an indicator vector). Suppose the state space is finite, with $\lvert \mathcal{S} \rvert$ distinct states. Then we can define:
+\[
+f(s) \;=\; e_s \;\in\; \mathbb{R}^{\lvert \mathcal{S} \rvert},
+\]
+where $e_s$ is a vector of length $\lvert \mathcal{S} \rvert$ with:
+\[
+(e_s)_i 
+= 
+\begin{cases}
+1, & \text{if } i = s,\\
+0, & \text{otherwise}.
+\end{cases}
+\]
+This representation implies the following:
+
+\begin{itemize}
+    \item The dimensionality of $f(s)$ is exactly $\lvert \mathcal{S} \rvert$.
+    \item Consequently, the parameter vector $w$ also has dimension $\lvert \mathcal{S} \rvert$. Hence, each state $s$ corresponds to one component $w_s$ in the parameter vector.
+    \item The approximate value function (for a state-value function) is then:
+    \[
+    \hat{V}(s) 
+    = f(s)^T \, w 
+    = e_s^T \, w
+    = w_s,
+    \]
+    which matches the classic \emph{tabular} representation where we store a single scalar value $V(s)$ for each state $s$.
+\end{itemize}
+
+\paragraph{Example with Small State Space.}
+Consider a small environment with five states $\{s^0, s^1, s^2, s^3, s^4\}$. The one-hot feature vectors $f(s^0), f(s^1), \ldots, f(s^4)$ might look like:
+\[
+f(s^0) = 
+\begin{bmatrix}
+1 \\ 0 \\ 0 \\ 0 \\ 0
+\end{bmatrix},\quad
+f(s^1) = 
+\begin{bmatrix}
+0 \\ 1 \\ 0 \\ 0 \\ 0
+\end{bmatrix},\quad
+\ldots,\quad
+f(s^4) = 
+\begin{bmatrix}
+0 \\ 0 \\ 0 \\ 0 \\ 1
+\end{bmatrix}.
+\]
+Then the parameter vector $w$ is 
+\[
+w 
+= 
+\begin{bmatrix}
+w_0 \\ w_1 \\ w_2 \\ w_3 \\ w_4
+\end{bmatrix},
+\]
+so that $\hat{V}(s^i) = w_i$ for $i = 0,1,\ldots,4$.
+
+\paragraph{Implication for LSTD and Other Methods.}
+In this tabular context:
+\begin{itemize}
+    \item The matrix $X$ and vector $y$ (or their sample-based approximations $\widehat{X}$, $\widehat{y}$) become $\lvert \mathcal{S} \rvert \times \lvert \mathcal{S} \rvert$ and $\lvert \mathcal{S} \rvert \times 1$, respectively.
+    \item Solving the linear system $X \, w = y$ is equivalent to solving for the exact value of each state (given enough samples and under appropriate conditions).
+    \item Methods like LSTD or TD(0) reduce to their well-known tabular forms, since each state is treated independently in the feature space (though transitions couple them together through the Bellman equation).
+\end{itemize}
+
+Thus, the one-hot encoding neatly bridges the gap between the tabular approach and general linear function approximation, showing that the tabular method is simply the special case where each state is its own feature dimension.

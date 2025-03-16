@@ -1,0 +1,79 @@
+\section{Derivation of the Matrix X in Dynamic Programming Settings}
+
+In many Dynamic Programming (DP) and Reinforcement Learning contexts, we encounter a matrix $X$ that helps us solve linear systems of the form
+\[
+X\,w = y,
+\]
+leading to the solution
+\[
+w^* = X^{-1}\,y.
+\]
+This section explains in detail how $X$ can be derived, why it takes its particular form, and how it relates to the DP framework.
+
+\subsection{Definitions and Notation}
+\begin{itemize}
+    \item $p^*(s)$ denotes a stationary distribution (or weighting) over the states $s$.
+    \item $p(s' \mid s)$ denotes the transition probability from state $s$ to state $s'$.
+    \item $f(s)$ is a feature vector associated with state $s$. 
+    \item We aim to define a matrix $X$ that captures the transitions and features, which will be used in evaluating or approximating a value function in DP.
+\end{itemize}
+
+\subsection{Direct Definition of $X$}
+One way to define $X$ is by summing over all states $s$ and possible next states $s'$:
+\[
+X = \sum_{s} p^*(s)\,\sum_{s'} p(s' \mid s)
+\Bigl[f(s)\,f(s) - f(s)\,f(s')\Bigr]^T.
+\]
+Here, the notation $\Bigl[\dots\Bigr]^T$ indicates that the expression inside is transposed to match the desired dimensions of $X$.
+
+\subsection{Summation Simplification}
+We can rewrite the difference inside the sum as:
+\[
+f(s)\,f(s) - f(s)\,f(s') = f(s)\,\bigl[f(s)-f(s')\bigr].
+\]
+Thus, the matrix $X$ becomes:
+\[
+X = \sum_{s} p^*(s)\,\sum_{s'} p(s' \mid s)
+f(s)\,\bigl[f(s)-f(s')\bigr]^T.
+\]
+Notice that $\sum_{s'} p(s' \mid s)f(s')$ represents the expected next feature vector given the current state $s$.
+
+\subsection{Matrix Representation}
+If we collect the features $f(s)$ for all states into a matrix $\mathbf{F}$, and define:
+\begin{itemize}
+    \item $\mathbf{D}_{p^*}$ as a diagonal matrix with $p^*(s)$ on its diagonal,
+    \item $\mathbf{P}$ as the transition matrix with entries $\mathbf{P}[s,s'] = p(s' \mid s)$,
+    \item $\mathbf{I}$ as the identity matrix,
+\end{itemize}
+then we can express $X$ succinctly as:
+\[
+X = \mathbf{F}^T\,\mathbf{D}_{p^*}\,(\mathbf{I} - \mathbf{P})\,\mathbf{F}.
+\]
+This representation reflects:
+\begin{itemize}
+    \item The weighting of states by $\mathbf{D}_{p^*}$,
+    \item The difference between the feature vector $f(s)$ and the expected next feature $\sum_{s'} p(s' \mid s) f(s')$, captured by $(\mathbf{I} - \mathbf{P})\mathbf{F}$,
+    \item The transformation into the final matrix form by $\mathbf{F}^T$.
+\end{itemize}
+
+\subsection{Implication for $w^*$}
+In many DP or policy evaluation scenarios, we have a linear equation:
+\[
+X\,w = y,
+\]
+where $y$ is a vector derived from rewards or temporal-difference terms. If $X$ is non-singular, the solution is given by:
+\[
+w^* = X^{-1}\,y.
+\]
+This weight vector $w^*$ typically represents the parameters of an approximate value function in reinforcement learning.
+
+\subsection{Conclusion}
+To summarize, the matrix $X$ is derived as follows:
+\[
+\boxed{
+X = \sum_{s} p^*(s)\,\sum_{s'} p(s' \mid s)
+\Bigl[f(s)f(s) - f(s)f(s')\Bigr]^T
+= \mathbf{F}^T\,\mathbf{D}_{p^*}\,(\mathbf{I} - \mathbf{P})\,\mathbf{F}.
+}
+\]
+This formulation is instrumental in both theoretical analyses and practical algorithms in approximate dynamic programming.

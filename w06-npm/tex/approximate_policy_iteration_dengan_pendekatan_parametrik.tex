@@ -1,0 +1,71 @@
+\section{Approximate Policy Iteration with a Parametric Approach}
+
+High-level view of \emph{approximate policy iteration} (API) can be viewed as a specialized 
+case of \emph{generalized policy iteration} (GPI) in Reinforcement Learning (RL). 
+There are two main components:
+
+\begin{enumerate}
+    \item \textbf{Approximate Policy Evaluation (Approx ValIter):}
+    This stage aims to evaluate the value function $V^\pi$ or $Q^\pi$ (depending 
+    on whether we adopt a value-based or action-value-based approach) in an 
+    \emph{approximate} manner.
+    \begin{itemize}
+        \item If a parametric approach is used, we define a value function 
+        $\hat{V}(s; w)$ (or $\hat{Q}(s,a; w)$) with parameter $w \in \mathbb{R}^k$.
+        \item The goal is to minimize the \emph{error} between $\hat{V}(s; w)$ 
+        and the true value, often through a mean-squared error or a temporal difference error.
+    \end{itemize}
+
+    \item \textbf{Approximate Policy Improvement (Approx PolIter):}
+    Once we have a sufficiently accurate approximation of the value function, we 
+    perform \emph{policy improvement}—that is, we update the policy $\pi$ 
+    (potentially also parameterized).
+    \begin{itemize}
+        \item For example, in a \emph{policy gradient} method, the policy 
+        $\pi(a \mid s; w)$ itself can be a parametric function of $w$.
+        \item In some scenarios, we might select an action $a$ that maximizes 
+        $\hat{Q}(s,a; w)$ to yield a deterministic policy.
+    \end{itemize}
+\end{enumerate}
+
+\noindent
+\textbf{Parametric Approach.}
+\begin{itemize}
+    \item We assume there is a parameter vector $w \in \mathbb{R}^k$ that defines 
+    the form of the value function or policy. For instance, if we use a linear 
+    function approximation:
+    \[
+    \hat{V}(s; w) = \phi(s)^\top w,
+    \]
+    where $\phi(s) \in \mathbb{R}^k$ is a feature vector for state $s$.
+    \item In some cases (e.g., a tabular setting), the dimensionality $k$ equals 
+    the number of states, and $\phi(s)$ becomes a one-hot vector.
+\end{itemize}
+
+\noindent
+\textbf{Parameter Optimization via SGD.}
+\begin{itemize}
+    \item We define an error function $e(w)$—for example, the mean-squared error 
+    between $\hat{V}(s; w)$ and the target.
+    \item We seek $w^*$ that minimizes $e(w)$:
+    \[
+    w^* 
+    = \arg\min_{w} \; e(w).
+    \]
+    \item To achieve this, we often use \emph{stochastic gradient descent} (SGD) 
+    or a related variant (e.g., Adam, RMSProp), updating $w$ iteratively:
+    \[
+    w \leftarrow w - \alpha \,\nabla_w e(w),
+    \]
+    where $\alpha$ is the learning rate.
+\end{itemize}
+
+\noindent
+\textbf{Iterative Process in RL.}
+\begin{itemize}
+    \item In RL, approximate evaluation and approximate improvement typically 
+    occur iteratively while the agent gathers new data by interacting with the environment.
+    \item Each time the value function is updated, the policy can be improved, 
+    and the new policy is then evaluated again, and so forth. This is the essence 
+    of \emph{generalized policy iteration} (GPI).
+\end{itemize}

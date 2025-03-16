@@ -1,0 +1,52 @@
+\section{Sample-Based Approximation of \texorpdfstring{$X$}{X} and the LSTD Estimator}
+
+In practice, instead of computing
+\[
+X 
+= \sum_{s} p^*(s)\,\sum_{s'} p(s' \mid s)
+\bigl[f(s)\,f(s) - f(s)\,f(s')\bigr]^T
+\]
+directly (which may be infeasible when the state space is large), we often approximate $X$ using a finite sample of $n$ transitions \(\{(s_i, s_i')\}_{i=1}^n\). The sample-based approximation, denoted by \(\widehat{X}\), is typically given by:
+
+\[
+\widehat{X}
+\;=\;
+\frac{1}{n}
+\sum_{i=1}^n
+f(s_i)\,\Bigl[f(s_i) - f(s_i')\Bigr]^T,
+\]
+where:
+\begin{itemize}
+    \item $n$ is the number of sampled transitions.
+    \item $f(s_i)$ is the feature vector corresponding to the $i$-th state $s_i$.
+    \item $s_i'$ is the next state observed after $s_i$.
+\end{itemize}
+
+\noindent
+Similarly, we can form an unbiased sample-based estimate of the vector $y$, denoted by \(\widehat{y}\). For instance, if $y$ represents expected returns or temporal-difference terms, we might write:
+\[
+\widehat{y}
+\;=\;
+\frac{1}{n}
+\sum_{i=1}^n
+\bigl[r(s_i) - g\bigr]\; f(s_i),
+\]
+where $r(s_i)$ is the (immediate) reward observed at $s_i$, and $g$ could be a discount factor term or baseline depending on the exact definition. The main idea is that both \(\widehat{X}\) and \(\widehat{y}\) are constructed as simple averages over the samples, making them unbiased estimators of $X$ and $y$, respectively, under suitable assumptions.
+
+\subsection{LSTD Solution}
+Once we have \(\widehat{X}\) and \(\widehat{y}\), the Least-Squares Temporal Difference (LSTD) method provides an estimate of the parameter vector $w$ via:
+\[
+\widehat{w}
+\;=\;
+\widehat{X}^{-1}\,\widehat{y}.
+\]
+This mirrors the exact solution \(w^* = X^{-1} y\) but uses sample-based estimates instead of population quantities. In practice, to avoid numerical instability when $n$ is small or $\widehat{X}$ is close to singular, one often adds a small regularization term \(\xi \mathbf{I}\) to the matrix, yielding:
+\[
+\widehat{w}
+\;=\;
+\bigl(\widehat{X} + \xi\,\mathbf{I}\bigr)^{-1} \,\widehat{y}.
+\]
+This technique is sometimes referred to as L2-regularization or ridge regression in the context of LSTD.
+
+\subsection{Discussion and Unbiasedness}
+By construction, if the samples $(s_i, s_i')$ are drawn from the stationary distribution $p^*(s)$ and transition model $p(s' \mid s)$, the expectation of $\widehat{X}$ coincides with $X$. Similarly, $\widehat{y}$ is unbiased for $y$. Hence, as $n \to \infty$, we expect $\widehat{w}$ to converge to the true parameter $w^*$, provided that $X$ is nonsingular and other regularity conditions hold.

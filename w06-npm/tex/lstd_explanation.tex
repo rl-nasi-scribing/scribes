@@ -1,0 +1,59 @@
+\subsection{Defining \texorpdfstring{$y$}{y} and the Practical Motivation for LSTD}
+
+Recall from the previous discussion that the matrix $X$ in the DP setting can be written as:
+\[
+X 
+= \mathbf{F}^T\,\mathbf{D}_{p^*}\,\bigl(\mathbf{I} - \mathbf{P}\bigr)\,\mathbf{F}.
+\]
+An analogous expression for the vector $y$ is often given by:
+\[
+y
+= \sum_{s} p^*(s)\,\bigl[r(s) - g\bigr]\;f(s)
+= \mathbf{F}^T \,\mathbf{D}_{p^*}\,\bigl(r - g\,\mathbf{1}\bigr),
+\]
+where:
+\begin{itemize}
+    \item $r(s)$ is the (immediate) reward function for state $s$,
+    \item $g$ is a constant (e.g., a baseline or a term related to discounting),
+    \item $\mathbf{1}$ is a vector of all ones,
+    \item $\mathbf{F}$ is the matrix of feature vectors, and
+    \item $\mathbf{D}_{p^*}$ is a diagonal matrix with entries $p^*(s)$.
+\end{itemize}
+
+\noindent
+\textbf{Why not directly compute \texorpdfstring{$X^{-1}y$}{X\^(-1) y}?}\\
+In practice, especially in RL, we do \emph{not} know:
+\begin{itemize}
+    \item The exact stationary distribution $p^*(s)$,
+    \item The full transition model $p(s' \mid s)$,
+    \item The exact reward function $r(s)$ for all states (it might be known locally but not necessarily globally).
+\end{itemize}
+Moreover, even if we did know them, computing large matrices $X$ and $y$ might be intractable for high-dimensional state spaces. Thus, we cannot simply form $X$ and $y$ and invert $X$ to solve
+\[
+X\,w^* = y.
+\]
+Instead, we rely on \emph{sample-based} methods, which is where \textbf{Least-Squares Temporal Difference} (\textbf{LSTD}) enters.
+
+\subsection{LSTD Recap}
+The LSTD approach addresses these limitations by replacing $X$ and $y$ with sample-based estimates $\widehat{X}$ and $\widehat{y}$:
+\[
+\widehat{X} 
+= \frac{1}{n} \sum_{i=1}^n f(s_i)\,\bigl[f(s_i) - f(s_i')\bigr]^T,
+\quad
+\widehat{y} 
+= \frac{1}{n} \sum_{i=1}^n \bigl[r(s_i) - g\bigr]\; f(s_i).
+\]
+Here:
+\begin{itemize}
+    \item $(s_i, s_i')$ are sampled transitions from an environment or simulator,
+    \item $r(s_i)$ is the observed reward at state $s_i$,
+    \item $g$ is a baseline or discount-related term, and
+    \item $n$ is the total number of samples.
+\end{itemize}
+Then, the LSTD solution approximates $w^*$ by:
+\[
+\widehat{w}
+= \widehat{X}^{-1}\,\widehat{y},
+\]
+assuming $\widehat{X}$ is non-singular (or using a regularized inverse such as $(\widehat{X} + \xi I)^{-1}$). In this way, LSTD sidesteps the need for full knowledge of $p^*(s)$ and $p(s'\mid s)$ by leveraging empirical data. As $n \to \infty$, the law of large numbers implies that $\widehat{X}$ and $\widehat{y}$ converge (in expectation) to $X$ and $y$, respectively, making $\widehat{w}$ converge to $w^*$ under appropriate conditions.
+
