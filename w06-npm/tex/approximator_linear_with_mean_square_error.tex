@@ -19,14 +19,7 @@ In matrix form:
 e_{\text{MS}}(\mathbf{w}) 
 \;=\; (\mathbf{v}_\pi - F\,\mathbf{w})^\top D_{p^\star} \,(\mathbf{v}_\pi - F\,\mathbf{w}),
 \]
-where \(D_{p^\star}\) is a diagonal matrix with \(D_{p^\star}(s,s) = p^\star(s)\). Minimizing this MSE w.r.t \(\mathbf{w}\) yields
-\[
-\nabla_{\mathbf{w}}\, e_{\text{MS}}(\mathbf{w}) \;=\; \mathbf{0}
-\;\;\;\Rightarrow\;\;\;
-\mathbf{w}^*
-\;=\; (F^\top\,D_{p^\star}\,F)^{-1}\,F^\top\,D_{p^\star}\,\mathbf{v}_\pi,
-\]
-if \((F^\top D_{p^\star} F)\) is invertible.
+where \(D_{p^\star}\) is a diagonal matrix with \(D_{p^\star}(s,s) = p^\star(s)\). 
 
 To get the optimal weights \(\mathbf{w}^*\) that minimize the weighted MSE, we can use the gradient descent algorithm. The update rule for the weights is:
 \[
