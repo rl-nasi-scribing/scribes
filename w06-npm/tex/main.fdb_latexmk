@@ -1,5 +1,5 @@
 # Fdb version 4
-["bibtex main"] 0 "main.aux" "main.bbl" "main" 1742094976.00415 0
+["bibtex main"] 0 "main.aux" "main.bbl" "main" 1742097704.32512 0
   "/usr/local/texlive/2025/texmf-dist/bibtex/bst/base/apalike.bst" 1292289607 24635 604dafcc79f521a11ea73e506e1fbd98 ""
   "main.aux" 0 -1 0 "pdflatex"
   "main.bib" 0 -1 0 ""
@@ -7,7 +7,7 @@
   "main.bbl"
   "main.blg"
   (rewritten before read)
-["pdflatex"] 1742094973.93536 "/home/dhito/rl-scribing/w06-npm/tex/main.tex" "main.pdf" "main" 1742094976.00447 0
+["pdflatex"] 1742097702.21844 "/home/dhito/rl-scribing/w06-npm/tex/main.tex" "main.pdf" "main" 1742097704.3255 0
   "/home/dhito/rl-scribing/w06-npm/tex/main.tex" 1742093471.46997 1537 29cb5efaf67d2ddb67c6616b5ceebb94 ""
   "/usr/local/texlive/2025/texmf-dist/fonts/enc/dvips/base/8r.enc" 1165713224 4850 80dc9bab7f31fb78a000ccfed0e27cab ""
   "/usr/local/texlive/2025/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
@@ -249,11 +249,11 @@
   "/usr/local/texlive/2025/texmf-var/web2c/pdftex/pdflatex.fmt" 1741997452 3345758 a57bad7812f7a68ac875428444c31b0a ""
   "/usr/local/texlive/2025/texmf.cnf" 1741997387.57503 455 5b996dcaa0eb4ef14a83b026bc0a008c ""
   "approximator_linear.tex" 1742093273.83635 1408 95d16ca9da83777ae2e90900b2672499 ""
-  "approximator_linear_with_mean_square_error.tex" 1742094973.7145 1300 2da954cbc07bb01963d7f7828d12303a ""
+  "approximator_linear_with_mean_square_error.tex" 1742097701.98589 3955 0b07e716ddf1c8d1751289bbb5a93bd8 ""
   "inexact_policy_evaluation.tex" 1742093205.28482 2392 9779aa6d30982c18fdeb969a539b7b53 ""
-  "main.aux" 1742094975.4885 2062 a8379b03987cf55f818ed6cf7c117def "pdflatex"
+  "main.aux" 1742097703.78294 2062 a8379b03987cf55f818ed6cf7c117def "pdflatex"
   "main.bbl" 0 -1 0 "bibtex main"
-  "main.out" 1742094975.4895 2232 a3a81ab8c810509b7cc9da64ed730cca "pdflatex"
+  "main.out" 1742097703.78394 2232 a3a81ab8c810509b7cc9da64ed730cca "pdflatex"
   "main.tex" 1742093471.46997 1537 29cb5efaf67d2ddb67c6616b5ceebb94 ""
   "rl_developments.tex" 1742063330.3542 2312 bc84b4d58e71c92d3ccfff860e0038fe ""
   "rl_scheme.tex" 1742088055.54774 2698 2f8cedda01715cef1f31b80bc80d979b ""

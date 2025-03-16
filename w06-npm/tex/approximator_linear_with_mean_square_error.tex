@@ -1,8 +1,10 @@
 \section{Linear Function Approximation with (Weighted) Mean Squared Error}
 
-In this scheme, we'll have \(p^\star(s)\), a stationary distribution over states that assigns a weight to each state. Note that we use it instead of uniform weighting, i.e., \(\frac{1}{|S|}\), as some states may be visited less frequently or not at all by the agent. Then, we define the weighted mean squared error (MSE) as:\[
+In this scheme, we'll have \(p^\star(s)\), a stationary distribution over states that assigns a weight to each state. Note that we use it instead of uniform weighting, i.e., \(\frac{1}{|S|}\), as some states may be visited less frequently or not at all by the agent. Then, we define the weighted mean squared error (MSE) as:
+\[
 e_{\text{MS}}(\mathbf{w}) 
-= \mathbb{E}_{s \sim p^\star(s)}\left[\left(v_\pi(s) - \hat{v}(s;\mathbf{w})\right)^2\right].\]
+= \mathbb{E}_{s \sim p^\star(s)}\left[\left(v_\pi(s) - \hat{v}(s;\mathbf{w})\right)^2\right].
+\]
 In discrete state spaces, we can write it down as:
 \[
 e_{\text{MS}}(\mathbf{w})
@@ -22,6 +24,54 @@ where \(D_{p^\star}\) is a diagonal matrix with \(D_{p^\star}(s,s) = p^\star(s)\
 \nabla_{\mathbf{w}}\, e_{\text{MS}}(\mathbf{w}) \;=\; \mathbf{0}
 \;\;\;\Rightarrow\;\;\;
 \mathbf{w}^*
-\;=\; (F^\top\,D\,F)^{-1}\,F^\top\,D\,\mathbf{v}_\pi,
+\;=\; (F^\top\,D_{p^\star}\,F)^{-1}\,F^\top\,D_{p^\star}\,\mathbf{v}_\pi,
 \]
-if \((F^\top D F)\) is invertible.
+if \((F^\top D_{p^\star} F)\) is invertible.
+
+To get the optimal weights \(\mathbf{w}^*\) that minimize the weighted MSE, we can use the gradient descent algorithm. The update rule for the weights is:
+\[
+\mathbf{w} \leftarrow \mathbf{w} - \alpha \nabla_{\mathbf{w}} e_{\text{MS}}(\mathbf{w}),
+\]
+where \(\alpha\) is the learning rate and \(\nabla_{\mathbf{w}} e_{\text{MS}}(\mathbf{w})\) is the gradient with respect to \(\mathbf{w}\) of \(e_{\text{MS}}(\mathbf{w})\).
+
+Starting with the gradient of the weighted MSE:
+\[
+\nabla_{\mathbf{w}} e_{\text{MS}}(\mathbf{w}) = \nabla_{\mathbf{w}} \mathbb{E}_{s \sim p^\star(s)}\left[\left(v_\pi(s) - \hat{v}(s;\mathbf{w})\right)^2\right].
+\]
+
+We move the gradient inside the expectation:
+\[
+\nabla_{\mathbf{w}} e_{\text{MS}}(\mathbf{w}) = \mathbb{E}_{s \sim p^\star(s)}\left[\nabla_{\mathbf{w}} \left(v_\pi(s) - \hat{v}(s;\mathbf{w})\right)^2\right].
+\]
+
+Then, we apply the chain rule:
+\[
+\nabla_{\mathbf{w}} e_{\text{MS}}(\mathbf{w}) = \mathbb{E}_{s \sim p^\star(s)}\left[2 \left(v_\pi(s) - \hat{v}(s;\mathbf{w})\right) \left(- \nabla_{\mathbf{w}} \hat{v}(s;\mathbf{w})\right)\right].
+\]
+
+Introducing \(-\frac{1}{2}\) on both sides to eliminate the 2:
+\[
+\nabla_{\mathbf{w}} e_{\text{MS}}(\mathbf{w}) = - \mathbb{E}_{s \sim p^\star(s)}\left[\left(v_\pi(s) - \hat{v}(s;\mathbf{w})\right) \nabla_{\mathbf{w}} \hat{v}(s;\mathbf{w})\right].
+\]
+
+Since \(\hat{v}(s;\mathbf{w}) = \mathbf{w}^\top \mathbf{f}(s)\), we have \(\nabla_{\mathbf{w}} \hat{v}(s;\mathbf{w}) = \mathbf{f}(s)\):
+\[
+\nabla_{\mathbf{w}} e_{\text{MS}}(\mathbf{w}) = - \mathbb{E}_{s \sim p^\star(s)}\left[\left(v_\pi(s) - \mathbf{w}^\top \mathbf{f}(s)\right) \mathbf{f}(s)\right].
+\]
+
+In RL setting, compared with Supervised Learning (SL):
+
+1. There are no training data, so \(v(s)\) is unknown. Thus, we need to approximate this with Temporal Difference (TD), Monte Carlo (MC), etc.
+
+2. Data isn't i.i.d., but Markovian, and collected by the agent itself.
+
+To address (1), we approximate \(v(s)\) by:
+\[
+v(s) \approx \mathbb{E}\left[\underbrace{(r(S, A) - \hat{g} + \hat{v}(s'; \mathbf{w})}_{\text{approximation of } v(s) \text{ based on BEE}} - \hat{v}(s; \mathbf{w})) \mathbf{f}(s)\right],
+\]
+where \(v(s)\) is approximated based on the Bellman Error Equation (BEE). This involves the approximation of \(\hat{v}(s; \mathbf{w})\), hence it's bootstrapping (using an estimation of a value to estimate another one).
+
+And because it's an expectation, it's sampling-friendly, i.e., using a sample of \((s, a, r', s')\) to get a sampling approximation:
+\[
+    \approx \left(r(s, a) - \hat{g} + \hat{v}(s'; \mathbf{w}) - \hat{v}(s; \mathbf{w})\right) \mathbf{f}(s).
+\]
