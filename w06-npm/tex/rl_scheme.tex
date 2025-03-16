@@ -1,0 +1,54 @@
+\section{RL Scheme For Attaining Optimal Policy}
+In Finite Unichain MDP, an optimal policy means a mapping from each state to action (deterministic) that gives the most optimal value to the agent with respect to a specific optimality criterion, e.g: discounted reward, average reward, total reward, bias. In RL, the two major schemes to find that out are:
+
+\begin{enumerate}
+    \item Value Iteration (VI)
+    
+    The notion of VI consists of these two main  steps:
+    \begin{itemize}
+        \item \textbf{Value Update}: Iteratively update the value function based on the Bellman equation until it converge.
+        \item \textbf{Policy Extraction}: Derive the optimal policy with respect to the optimal value function.
+    \end{itemize}
+    
+    From VI, we can derive \( Q_x^* \)-learning, where x denotes the optimality criteria, e.g., gain, bias , $\gamma$, or total reward. Note that in the average reward setting, we interested in \( Q_b^* \) instead of \( Q_g^* \).
+    
+    \vspace{0.4cm}
+
+    \item Policy Iteration (PI)
+    
+    Policy Iteration is an algorithm that iteratively evaluates and improves a policy until it converges to the optimal policy. It consists of two main steps:
+    \begin{itemize}
+        \item \textbf{Policy Evaluation}: Calculate the policy's value.
+        \item \textbf{Policy Improvement}: Update the policy by choosing actions that maximize the value.
+    \end{itemize}
+    
+    In RL setting, we can't do exact calculations for PI. Thus, we need to derive the approach to the inexact (approximate) way, and this is called Generalized Policy Iteration (GPI).
+    
+\end{enumerate}
+
+\begin{figure}[h]
+    \centering
+    \begin{tikzpicture}[->, >=stealth', auto, semithick, node distance=3cm]
+        \tikzstyle{state}=[fill=white,draw=black,text=black]
+
+        \node[state]    (A)                     {Policy Iteration};
+        \node[state]    (B) [right=1cm of A] {Value Iteration}; % Increased horizontal distance
+        \node[state]    (C) [below of=A, node distance=4cm] {Generalized Policy Iteration};
+        \node[state]    (D) [below of=B, node distance=4cm] {\( Q_x^* \)-learning};
+
+        \path (A) edge [->] node[left] {} (C)
+                  (B) edge [->] node[right] {} (D);
+
+        \node[right=0.5cm of B] (DP) {Works in DP setting};
+        \node[right=0.5cm of D] (RL) {Works in RL setting};
+    \end{tikzpicture}
+    \caption{Major RL Schemes To Find Optimal Policy}
+    \label{fig:rl_visual}
+\end{figure}
+
+
+\textbf{Some Questions To Ponder:}
+\begin{itemize}
+    \item Which is more intuitive?
+    \item Which is more suitable to use? Remember the "no free lunch theorem": sometimes PI is better than VI, and vice versa.
+\end{itemize}

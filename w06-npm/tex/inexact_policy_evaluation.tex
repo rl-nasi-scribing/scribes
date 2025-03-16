@@ -1,0 +1,31 @@
+% inexact_policy_evaluation.tex
+\section{Inexact Policy Evaluation}
+
+In DP setting, we can exactly evaluate a policy via \(v_x(\pi, s)\), where x is the optimality criteria. This can also be denoted as $v_x(s)$ whenever the policy of interest is clear from context. However, in RL setting, we can't do that as:
+\begin{itemize}
+    \item The state transition probability (P) and reward scheme (R) is unknown.
+    \item We need to use tabular method to store a separate value for each state (or state-action pair), which is infeasible for very large state spaces.
+\end{itemize}
+
+\subsection{Function Approximation}
+To get rid of the problems that present in RL setting compared to DP setting, we can use approximation by defining policy value function approximator. Based on its characteristics, we can classify the function approximator into:
+
+\subsubsection{Parametric Function Approximators}
+Parametric function approximators are characterized by having a fixed and finite number of parameters. These parameters are adjusted during the learning process to approximate the true value function. Parametric approximators can be further classified into:
+
+\textbf{Linear Function Approximators:}
+In linear function approximation, the value function is represented as a linear combination of features, e.g., we can define feature vector, weight those feature vectors, and sum them up altogether to get the approximation. 
+
+\textbf{Non-linear Function Approximators:}
+In non-linear function approximation, the value function is represented by a non-linear function of the parameters and features, e.g.,:
+\begin{itemize}
+    \item Neural Networks: the value function is approximated by the output of the neural network, with the weights and biases of the network serving as the parameters.
+    \item Decision Trees: can partition the state space into regions and assign values to each region.
+\end{itemize}
+
+\subsubsection{Non-Parametric Function Approximators}
+Non-parametric function approximators do not have a fixed set of parameters. The complexity of the model grows with the amount of data, e.g.,:
+\begin{itemize}
+    \item Nearest Neighbors: The value of a state is estimated based on the values of its nearest neighbors in the state space.
+    \item Kernel Methods: Kernel methods use kernel functions to measure the similarity between states and estimate the value function.
+\end{itemize}

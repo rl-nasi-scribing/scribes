@@ -1,0 +1,19 @@
+\section{Linear Function Approximation}
+As explained in 3.1.1, the approach is to represent the value function approximation as a linear combination of features. For that, we define feature vector \(\mathbf{f}(s) \in \mathbb{R}^n\) for each state \(s\), and a weight vector \(\mathbf{w} \in \mathbb{R}^n\), where n is dim(w) as this is linear setting, to form the policy value function approximator:
+\[
+\hat{v}(s;\mathbf{w}) \;=\; \mathbf{w}^\top \mathbf{f}(s). \approx v(s)
+\]
+In matrix form (for a finite state set), we will have \(F\) as the \(|S|\times dim(W)\) matrix of all feature vectors and \(\mathbf{w}\) vector with size \(dim(W)\times 1\) to form:
+\[
+\hat{\mathbf{v}} \;=\; F \,\mathbf{w},
+\]
+where \(\hat{\mathbf{v}}\) is the \(|S|\times 1\) vector of approximate values.
+
+Then, what's next after we define the value function approximator is to learn the weights \(\mathbf{w}\) that minimize the error between the true value function and the approximated value function. We can use Mean Squared Error (MSE) or Projected Bellman Error (PBE) as the criterion for the best approximation.
+
+To find the optimal weights \(\mathbf{w}^*\), we solve the following optimization problem:
+\[
+\mathbf{w}^* = \underset{\mathbf{w} \in \mathbb{R}^{\text{dim}(\mathbf{w})}}{\arg\min} \, e_x(\mathbf{w}),
+\]
+where the subscript \(x\) denotes the type of error, e.g., mean squared (MS) or projected Bellman (PB).
+
