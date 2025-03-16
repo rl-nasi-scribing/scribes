@@ -1,5 +1,5 @@
 # Fdb version 4
-["bibtex main"] 0 "main.aux" "main.bbl" "main" 1742104516.99526 0
+["bibtex main"] 0 "main.aux" "main.bbl" "main" 1742109918.11531 0
   "c:/texlive/2024/texmf-dist/bibtex/bst/base/apalike.bst" 1738743556 24635 604dafcc79f521a11ea73e506e1fbd98 ""
   "main.aux" 0 -1 0 "pdflatex"
   "main.bib" 0 -1 0 ""
@@ -7,7 +7,7 @@
   "main.bbl"
   "main.blg"
   (rewritten before read)
-["pdflatex"] 1742104512.81718 "c:/Users/moham/OneDrive/Desktop/MRL/scribe-w6/w06-npm/tex/main.tex" "main.pdf" "main" 1742104516.99618 0
+["pdflatex"] 1742109913.75689 "c:/Users/moham/OneDrive/Desktop/MRL/scribe-w6/w06-npm/tex/main.tex" "main.pdf" "main" 1742109918.11638 0
   "approximate_policy_iteration_dengan_pendekatan_parametrik.tex" 1742103058 3082 42dbd32991c1e2fa96a14133253a2846 ""
   "approximator_linear.tex" 1742099025 1427 95d16ca9da83777ae2e90900b2672499 ""
   "approximator_linear_with_mean_square_error.tex" 1742099025 3750 9b967cbd1df6b80282b82b6b1d077a15 ""
@@ -285,12 +285,12 @@
   "derivation_of_the_matrix_x_in_dynamic_programming_settings.tex" 1742099992 3302 213a3afeeae43b1877a787f370d54a6a ""
   "inexact_policy_evaluation.tex" 1742099025 2423 9779aa6d30982c18fdeb969a539b7b53 ""
   "lstd_explanation.tex" 1742101720 2694 19ae36d6254fa7ae0dc7006d3d80b549 ""
-  "main.aux" 1742104515 9282 9972daa43bf1499b87241de943c398c3 "pdflatex"
+  "main.aux" 1742109916 8595 3b76729555543a667eea437b6b3da8fd "pdflatex"
   "main.bbl" 0 -1 0 "bibtex main"
-  "main.out" 1742104515 8753 e4ef26ea0d005af117cdbf58878d03ef "pdflatex"
+  "main.out" 1742109916 7950 0f03c41fba54479be8ba27c2b208c8c2 "pdflatex"
   "main.tex" 1742102942 1968 89ba7e66f9c4f9b788432484639ed3b0 ""
   "practical_consideration_in_rl.tex" 1742101969 3593 12a658cc6c486aa8aeed9bc2b2080fe3 ""
-  "projected_bellman.tex" 1742104505 16595 84af22b81f9da6729c1cef4848d78bd8 ""
+  "projected_bellman.tex" 1742109913 14009 0ca7cd4a707ce0bab19271880722b17c ""
   "rl_developments.tex" 1742099025 2342 bc84b4d58e71c92d3ccfff860e0038fe ""
   "rl_scheme.tex" 1742099025 2751 2f8cedda01715cef1f31b80bc80d979b ""
   "sample_based_estimation.tex" 1742100293 2592 87814d6bb8f4d754679836a2bbd00950 ""
