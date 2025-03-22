@@ -1,78 +1,28 @@
-\section{Bellman Equation, Bellman Error, and Projected Bellman Error}
+\section{Projected Bellman Error}
 \label{sec:bellman_error}
 
 This section explains several key ideas in Reinforcement Learning and Approximate Dynamic Programming:
 
-\begin{enumerate}
-    \item \textbf{Bellman Equation (BE).}
-    \item \textbf{Bellman Error (BEE).}
-    \item \textbf{Projected Bellman Error (PBE).}
-\end{enumerate}
-
-\subsection{Bellman Equation}
-\label{subsec:bellman_equation}
-
-The \emph{Bellman equation} for a value function $v$ can often be written in the form:
-\[
-v(s) \;=\; r(s) \;-\; g \;+\; \mathbb{E}\bigl[v(s') \mid s\bigr],
-\]
-where:
-\begin{itemize}
-    \item $r(s)$ is the immediate reward when in state $s$,
-    \item $g$ is a constant (which may represent a baseline, a shift in the reward, or a discount factor term),
-    \item $s'$ is the next state following $s$, according to some transition dynamics.
-\end{itemize}
-For a finite state space, we often write this in matrix/vector form as:
-\[
-(I - P')\,v \;=\; r - g\,\mathbf{1},
-\]
-where:
-\begin{itemize}
-    \item $v$ is the vector of values $v(s)$,
-    \item $r$ is the vector of immediate rewards $r(s)$,
-    \item $\mathbf{1}$ is a vector of all ones,
-    \item $P'$ is a state-transition matrix (or its expectation under the policy), so that $P'v$ corresponds to $\mathbb{E}[v(s')]$.
-\end{itemize}
-Solving this linear system for $v$ yields the fixed point of the Bellman operator.
-
-\subsection{Bellman Error (BEE)}
-\label{subsec:bellman_error_measure}
-
-The \emph{Bellman error} measures how well a candidate value function $v$ satisfies the Bellman equation. In single-state form:
-\[
-\text{Bellman Error}(s) 
-\;=\; \bigl[r(s) - g + \mathbb{E}[v(s')] \bigr] \;-\; v(s).
-\]
-Equivalently, for the entire state space:
-\[
-\text{BEE}(v) 
-\;=\; (r - g\,\mathbf{1}) + P'\,v \;-\; v
-\;=\; (I - P')\,v \;-\; (r - g\,\mathbf{1}) \quad (\text{up to a sign convention}).
-\]
-When the Bellman error is zero for all states, $v$ exactly satisfies the Bellman equation.
-
-\subsection{Projected Bellman Error (PBE)}
-\label{subsec:pbe_definition}
 
 In approximate dynamic programming or reinforcement learning, $v$ may lie in a restricted function space (e.g., a parametric class of value functions). Hence, we cannot always solve 
 \[
 (I - P')\,v = r - g\,\mathbf{1}
 \]
-exactly. Instead, we use a \emph{projection} operator $\Pi$ that projects any function onto our approximation space. Thus, the \emph{projected Bellman error} (PBE) is defined as:
+exactly. Instead, we use a \emph{projection} operator $\mathbb{P}$ that projects any function onto our approximation space. Thus, the \emph{projected Bellman error} (PBE) is defined as:
 \[
 \text{PBE}(v) 
-\;=\; \Pi\Bigl[ (r - g\,\mathbf{1}) + P'\,v \Bigr] \;-\; v.
+\;=\; \mathbb{P}\Bigl[(r - g\,\mathbf{1}) + P'\,v\Bigr] \;-\; v.
 \]
-This quantity indicates how close the projected Bellman update $\Pi[\mathbb{B}v]$ is to $v$, where the Bellman operator is given by
+This quantity indicates how close the projected Bellman update $\mathbb{P}[\mathbb{B}v]$ is to $v$, where the Bellman operator is given by
 \[
-\mathbb{B}v \;\equiv\; r - g\,\mathbf{1} \;+\; P' v.
+\mathbb{B}v \;\equiv\; r - g\,\mathbf{1} \;+\; P'v.
 \]
 Minimizing the PBE is a common strategy in methods such as LSTD, where we seek a parameterized value function $\hat{v}(w)$ that is as close as possible (in a projected sense) to the Bellman update.
 
 \subsubsection{Norm-Based View of PBE}
 A common way to quantify the PBE is via a weighted $\ell_2$-norm (often using the stationary distribution $p^*(s)$ as weights). Let
 \[
-\Delta v(s) \;=\; \hat{v}(w)(s) \;-\; \Pi\bigl[\mathbb{B}\,\hat{v}(w)\bigr](s).
+\Delta v(s) \;=\; \hat{v}(w)(s) \;-\; \mathbb{P}\bigl[\mathbb{B}\,\hat{v}(w)\bigr](s).
 \]
 Then, the PBE can be measured as:
 \[
@@ -84,10 +34,10 @@ e_{\mathrm{PB}}
 \;=\;
 \mathbb{E}_{s \sim p^*}\bigl[\Delta v(s)^2\bigr].
 \]
-When $e_{\mathrm{PB}} = 0$, it implies that $\hat{v}(w)$ is a fixed point of the projected Bellman operator, i.e., $\hat{v}(w) = \Pi[\mathbb{B}\,\hat{v}(w)]$.
+When $e_{\mathrm{PB}} = 0$, it implies that $\hat{v}(w)$ is a fixed point of the projected Bellman operator, i.e., $\hat{v}(w) = \mathbb{P}[\mathbb{B}\,\hat{v}(w)]$.
 
 \subsection{Why It Does Not Involve the True Value}
-A key point is that we do \emph{not} need the \emph{true} value function $v^*$ to measure or minimize the Bellman error (or the projected Bellman error). Instead, we only need:
+A key point is that we do \emph{not} need the \emph{true} value function $v^*$ to measure or minimize the Bellman error equation (or the projected Bellman error). Instead, we only need:
 \begin{itemize}
     \item Observations of $(s, r(s), s')$ transitions (in model-free settings), or
     \item A model for the reward and transition probabilities (in model-based settings).
@@ -95,22 +45,12 @@ A key point is that we do \emph{not} need the \emph{true} value function $v^*$ t
 From these, we can construct the Bellman operator $\mathbb{B}$ (or an empirical version of it) and compare $\mathbb{B}v$ to $v$. This approach is stable because it relies on the \emph{self-consistency} property of the Bellman equation rather than on direct knowledge of $v^*$.
 
 \subsection{Temporal Difference Error Connection}
-Methods like \emph{Temporal Difference (TD) learning} effectively estimate the Bellman error incrementally. A TD update can be viewed as trying to drive the quantity
+Methods like \emph{Temporal Difference (TD) learning} effectively estimate the Bellman error equation incrementally. A TD update can be viewed as trying to drive the quantity
 \[
 \delta_t 
 = r_t - g + v(s_{t+1}) - v(s_t)
 \]
 to zero over time, which corresponds to making $v$ satisfy the Bellman equation in expectation.
-
-% \subsection{Summary}
-% \begin{itemize}
-%     \item The Bellman equation sets up a fixed-point condition for the value function.
-%     \item The Bellman error quantifies the difference between the current $v$ and the Bellman update.
-%     \item In approximate methods, we project the Bellman update onto the approximation space, yielding the \emph{Projected Bellman Error}.
-%     \item The PBE can be measured via a weighted $\ell_2$-norm under $p^*(s)$, capturing how far $\hat{v}(w)$ is from its projected Bellman update.
-%     \item Neither BEE nor PBE requires knowledge of the true value $v^*$; they only require the Bellman operator and (possibly) its samples.
-%     \item This leads to stable iterative methods like LSTD or TD, which converge under appropriate conditions without ever using the exact $v^*$.
-% \end{itemize}
 
 \subsection{Geometric Interpretation in Parameter Space}
 
@@ -138,7 +78,7 @@ to zero over time, which corresponds to making $v$ satisfy the Bellman equation 
     % Projection of Bv(w) back into the parameter space
     \coordinate (PiBvW) at (1.4,1.0);
     \draw[fill] (PiBvW) circle (1pt)
-         node[right] {\footnotesize $\Pi[\mathbb{B}\hat{v}(\mathbf{w})]$};
+         node[right] {\footnotesize $\mathbb{P}[\mathbb{B}\hat{v}(\mathbf{w})]$};
     
     % Dashed line showing the projection from the Bellman update to its projection
     \draw[dashed] (BvWout) -- (PiBvW);
@@ -148,7 +88,7 @@ to zero over time, which corresponds to making $v$ satisfy the Bellman equation 
          node[midway,sloped,below] {\footnotesize PBE};
     
 \end{tikzpicture}
-\caption{Conceptual illustration of the geometric interpretation in parameter space. The light gray square represents the 2D parameter space where $\mathbf{w}$ resides. Applying the Bellman operator $\mathbb{B}$ to $\hat{v}(\mathbf{w})$ can yield a value function outside the representable space (point $\mathbb{B}\hat{v}(\mathbf{w})$). The projection operator $\Pi$ then maps it back into the parameter space (point $\Pi[\mathbb{B}\hat{v}(\mathbf{w})]$). The orange arrow (labeled PBE) shows the difference between the current value function and its projected Bellman update.}
+\caption{Conceptual illustration of the geometric interpretation in parameter space. The light gray square represents the 2D parameter space where $\mathbf{w}$ resides. Applying the Bellman operator $\mathbb{B}$ to $\hat{v}(\mathbf{w})$ can yield a value function outside the representable space (point $\mathbb{B}\hat{v}(\mathbf{w})$). The projection operator $\mathbb{P}$ then maps it back into the parameter space (point $\mathbb{P}[\mathbb{B}\hat{v}(\mathbf{w})]$). The orange arrow (labeled PBE) shows the difference between the current value function and its projected Bellman update.}
 \label{fig:param_space}
 \end{figure}
 
@@ -157,11 +97,11 @@ to zero over time, which corresponds to making $v$ satisfy the Bellman equation 
     \item \textbf{Parameter Space:} The light gray square represents the 2D parameter space, with axes $w_1$ and $w_2$. Every point in this space corresponds to a set of parameters $\mathbf{w}$ defining the approximate value function $\hat{v}(\mathbf{w})$.
     \item \textbf{Current Parameter Vector:} The point labeled $\mathbf{w}$ (located at $(1,1)$ in this example) is our current estimate in the parameter space.
     \item \textbf{Bellman Operator Application:} The arrow from $\mathbf{w}$ to the point labeled $\mathbb{B}\hat{v}(\mathbf{w})$ represents the application of the Bellman operator. This update may move the value function outside the representable parameter space.
-    \item \textbf{Projection Operator:} The dashed line and the point $\Pi[\mathbb{B}\hat{v}(\mathbf{w})]$ indicate that we use a projection operator $\Pi$ to map the Bellman update back into our parameter space.
-    \item \textbf{Projected Bellman Error (PBE):} The orange arrow from $\mathbf{w}$ to $\Pi[\mathbb{B}\hat{v}(\mathbf{w})]$ represents the Projected Bellman Error. Minimizing this error is key to ensuring that our approximate value function is as close as possible to being a fixed point of the projected Bellman operator.
+    \item \textbf{Projection Operator:} The dashed line and the point $\mathbb{P}[\mathbb{B}\hat{v}(\mathbf{w})]$ indicate that we use a projection operator $\mathbb{P}$ to map the Bellman update back into our parameter space.
+    \item \textbf{Projected Bellman Error (PBE):} The orange arrow from $\mathbf{w}$ to $\mathbb{P}[\mathbb{B}\hat{v}(\mathbf{w})]$ represents the Projected Bellman Error. Minimizing this error is key to ensuring that our approximate value function is as close as possible to being a fixed point of the projected Bellman operator.
 \end{itemize}
 
-\subsection{Projection Operator \texorpdfstring{$\Pi$}{Pi}}
+\subsection{Projection Operator \texorpdfstring{$\mathbb{P}$}{P}}
 
 Suppose we have:
 \[
@@ -173,7 +113,7 @@ Here, $|S|$ is the number of states (or samples), and each row of $F$ is a featu
 
 We wish to define a \emph{projection} operator
 \[
-\Pi: \mathbb{R}^{|S|} \;\to\; \text{Col}(F),
+\mathbb{P}: \mathbb{R}^{|S|} \;\to\; \text{Col}(F),
 \]
 where $\text{Col}(F)$ is the column space spanned by $F$. The projection is taken under the $\ell_2$-norm weighted by $D_{p^*}$, namely
 \[
@@ -181,11 +121,11 @@ where $\text{Col}(F)$ is the column space spanned by $F$. The projection is take
 \]
 Formally, for any vector $v \in \mathbb{R}^{|S|}$, we define
 \[
-\Pi(v) \;=\; \arg\min_{x \in \text{Col}(F)} \;\|v - x\|_{D_{p^*}}^2.
+\mathbb{P}(v) \;=\; \arg\min_{x \in \text{Col}(F)} \;\|v - x\|_{D_{p^*}}^2.
 \]
 Since $x \in \text{Col}(F)$ can be written as $x = Fw$ for some $w \in \mathbb{R}^k$, the problem becomes:
 \[
-\Pi(v) 
+\mathbb{P}(v) 
 \;=\; \arg\min_{Fw} \;\|v - Fw\|_{D_{p^*}}^2.
 \]
 We can solve for $w$ by expanding and taking derivatives.
@@ -199,7 +139,7 @@ We can solve for $w$ by expanding and taking derivatives.
     \;=\; (v - Fw)^T\,D_{p^*}\,(v - Fw).
     \]
     
-    \item \textbf{Take the gradient w.r.t.\ $w$:}
+    \item \textbf{Take the gradient with respect to $w$:}
     \[
     \frac{\partial}{\partial w} 
     \bigl[(v - Fw)^T\,D_{p^*}\,(v - Fw)\bigr]
@@ -221,21 +161,21 @@ We can solve for $w$ by expanding and taking derivatives.
     
     \item \textbf{Hence, the projection of $v$:}
     \[
-    \Pi(v)
+    \mathbb{P}(v)
     \;=\; F\,w^*
     \;=\; F\,\bigl(F^T\,D_{p^*}\,F\bigr)^{-1}\,F^T\,D_{p^*}\,v.
     \]
 \end{enumerate}
 
-Therefore, the projection operator $\Pi$ onto the column space of $F$ under the $D_{p^*}$-weighted norm is
+Therefore, the projection operator $\mathbb{P}$ onto the column space of $F$ under the $D_{p^*}$-weighted norm is
 \[
 \boxed{
-\Pi 
+\mathbb{P} 
 \;=\; 
 F\,\bigl(F^T\,D_{p^*}\,F\bigr)^{-1}\,F^T\,D_{p^*}.
 }
 \]
-In other words, for any vector $v$, $\Pi(v)$ is given by the above formula.
+In other words, for any vector $v$, $\mathbb{P}(v)$ is given by the above formula.
 
 \subsection{Deriving \texorpdfstring{$w^*$}{w*} to Minimize the Projected Bellman Error}
 
@@ -250,7 +190,7 @@ e_{\mathrm{PB}}(w)
 \bigl\|
 \hat{v}(w) 
 \;-\;
-\Pi\bigl[\mathbb{B}\,\hat{v}(w)\bigr]
+\mathbb{P}\bigl[\mathbb{B}\,\hat{v}(w)\bigr]
 \bigr\|_{D_{p^*}}^2,
 \]
 where $\mathbb{B}$ is the Bellman operator, e.g.,
@@ -271,9 +211,9 @@ w^*
 
 \paragraph{Outline of the Solution:}
 \begin{itemize}
-    \item \textbf{Apply $\Pi$:} 
+    \item \textbf{Apply $\mathbb{P}$:} 
     \[
-    \Pi\bigl[\mathbb{B}\,\hat{v}(w)\bigr]
+    \mathbb{P}\bigl[\mathbb{B}\,\hat{v}(w)\bigr]
     \;=\;
     F\,(F^T D_{p^*} F)^{-1} F^T\,D_{p^*}\,\bigl(r - g\,\mathbf{1} + P'\,F\,w\bigr).
     \]
@@ -282,7 +222,7 @@ w^*
     \[
     \hat{v}(w) 
     \;-\;
-    \Pi\bigl[\mathbb{B}\,\hat{v}(w)\bigr]
+    \mathbb{P}\bigl[\mathbb{B}\,\hat{v}(w)\bigr]
     \;=\;
     F\,w
     \;-\;
@@ -299,7 +239,7 @@ w^*
     F\,(F^T D_{p^*} F)^{-1} F^T\,D_{p^*}\,\bigl(r - g\,\mathbf{1} + P'\,F\,w\bigr)
     \bigr\|_{D_{p^*}}^2.
     \]
-    One can then take the gradient w.r.t.\ $w$ and set it to zero. 
+    One can then take the gradient with respect to $w$ and set it to zero. 
     Under suitable assumptions (like invertibility of $(F^T D_{p^*} (I - P') F)$), 
     the resulting $w^*$ often matches the well-known LSTD solution:
     \[
@@ -322,7 +262,7 @@ w^*
 The key formulas are:
 \[
 \boxed{
-\Pi(v) 
+\mathbb{P}(v) 
 = 
 F \,\bigl(F^T\,D_{p^*}\,F\bigr)^{-1}\,F^T\,D_{p^*}\,v,
 \quad
@@ -332,7 +272,7 @@ w^*
 \bigl\|\,
 F w
 \;-\;
-\Pi\bigl[\mathbb{B}(F w)\bigr]
+\mathbb{P}\bigl[\mathbb{B}(F w)\bigr]
 \bigr\|_{D_{p^*}}^2.
 }
 \]
@@ -370,7 +310,6 @@ represents the parameter \(w\), and the vertical axis represents the error funct
     \draw[->] (0,-0.3) -- (0,3) node[above] {\footnotesize $e$};
 
     % Parabola
-    % We can approximate a parabola with a plot or just a curved line.
     \draw[domain=0.4:4.4, smooth, thick, blue] 
         plot (\x, {0.4+0.5*(\x-2.4)^2});
     
@@ -398,4 +337,3 @@ At the minimum $w^*$, the slope (or derivative) is zero.}
     \item In the context of LSTD or other least-squares methods, solving this equation often yields a \emph{closed-form} expression for \(w^*\).
     \item Graphically, a zero gradient corresponds to the point where the error curve has zero slope (the bottom of a parabola in a 1D schematic).
 \end{itemize}
-

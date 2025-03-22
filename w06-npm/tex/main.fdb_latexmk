@@ -1,5 +1,5 @@
 # Fdb version 4
-["bibtex main"] 0 "main.aux" "main.bbl" "main" 1742624997.53208 0
+["bibtex main"] 0 "main.aux" "main.bbl" "main" 1742625116.24262 0
   "/usr/local/texlive/2025/texmf-dist/bibtex/bst/base/apalike.bst" 1292289607 24635 604dafcc79f521a11ea73e506e1fbd98 ""
   "main.aux" 0 -1 0 "pdflatex"
   "main.bib" 0 -1 0 ""
@@ -7,7 +7,7 @@
   "main.bbl"
   "main.blg"
   (rewritten before read)
-["pdflatex"] 1742624995.7272 "/home/dhito/rl-scribing/w06-npm/tex/main.tex" "main.pdf" "main" 1742624997.53232 0
+["pdflatex"] 1742625114.36918 "/home/dhito/rl-scribing/w06-npm/tex/main.tex" "main.pdf" "main" 1742625116.24285 0
   "/home/dhito/rl-scribing/w06-npm/tex/main.tex" 1742624993.71342 1879 89ba7e66f9c4f9b788432484639ed3b0 ""
   "/usr/local/texlive/2025/texmf-dist/fonts/enc/dvips/base/8r.enc" 1165713224 4850 80dc9bab7f31fb78a000ccfed0e27cab ""
   "/usr/local/texlive/2025/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
@@ -285,12 +285,12 @@
   "derivation_of_the_matrix_x_in_dynamic_programming_settings.tex" 1742105193.30559 3223 213a3afeeae43b1877a787f370d54a6a ""
   "inexact_policy_evaluation.tex" 1742093205.28482 2392 9779aa6d30982c18fdeb969a539b7b53 ""
   "lstd_explanation.tex" 1742105193.30559 2694 19ae36d6254fa7ae0dc7006d3d80b549 ""
-  "main.aux" 1742624997.05144 9282 9972daa43bf1499b87241de943c398c3 "pdflatex"
+  "main.aux" 1742625115.7894 8595 3b76729555543a667eea437b6b3da8fd "pdflatex"
   "main.bbl" 0 -1 0 "bibtex main"
-  "main.out" 1742624997.05344 8753 e4ef26ea0d005af117cdbf58878d03ef "pdflatex"
+  "main.out" 1742625115.7904 7950 0f03c41fba54479be8ba27c2b208c8c2 "pdflatex"
   "main.tex" 1742624993.71342 1879 89ba7e66f9c4f9b788432484639ed3b0 ""
   "practical_consideration_in_rl.tex" 1742105193.30959 3593 12a658cc6c486aa8aeed9bc2b2080fe3 ""
-  "projected_bellman.tex" 1742105193.30959 16595 84af22b81f9da6729c1cef4848d78bd8 ""
+  "projected_bellman.tex" 1742625112.11837 14009 0ca7cd4a707ce0bab19271880722b17c ""
   "rl_developments.tex" 1742063330.3542 2312 bc84b4d58e71c92d3ccfff860e0038fe ""
   "rl_scheme.tex" 1742088055.54774 2698 2f8cedda01715cef1f31b80bc80d979b ""
   "sample_based_estimation.tex" 1742105193.30959 2592 87814d6bb8f4d754679836a2bbd00950 ""
