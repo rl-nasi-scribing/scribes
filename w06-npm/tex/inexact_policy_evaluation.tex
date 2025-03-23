@@ -3,7 +3,7 @@
 
 In DP setting, we can exactly evaluate a policy via \(v_x(\pi, s)\), where x is the optimality criteria. This can also be denoted as $v_x(s)$ whenever the policy of interest is clear from context. However, in RL setting, we can't do that as:
 \begin{itemize}
-    \item The state transition probability (P) and reward scheme (R) is unknown.
+    \item The state transition probability p and reward scheme r(s,a) is unknown.
     \item We need to use tabular method to store a separate value for each state (or state-action pair), which is infeasible for very large state spaces.
 \end{itemize}
 
@@ -27,5 +27,5 @@ In non-linear function approximation, the value function is represented by a non
 Non-parametric function approximators do not have a fixed set of parameters. The complexity of the model grows with the amount of data, e.g.,:
 \begin{itemize}
     \item Nearest Neighbors: The value of a state is estimated based on the values of its nearest neighbors in the state space.
-    \item Kernel Methods: Kernel methods use kernel functions to measure the similarity between states and estimate the value function.
+    \item Kernel Methods: Kernel methods use kernel functions to measure the similarity between states and estimate the value function. The example of this is from \cite{Kroemer2011}, which uses kernel density estimation to represent the system and derive value functions via Nadaraya-Watson kernel regression.
 \end{itemize}
