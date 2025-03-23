@@ -1,0 +1,84 @@
+\section{Discounted Reward and the Policy Gradient Theorem}
+
+In reinforcement learning, when working with continuing tasks, we often aim to maximize the expected \emph{discounted return}. This leads to defining the performance objective as:
+\[
+J(\boldsymbol{\theta}) = \mathbb{E}_{\pi_{\boldsymbol{\theta}}} \left[ \sum_{t=0}^{\infty} \gamma^t R_{t+1} \right] = \mathbf{P}_\pi^* \mathbf{r}_\pi,
+\]
+where:
+\begin{itemize}
+  \item \( \boldsymbol{\theta} \in \mathbb{R}^d \) is the policy parameter,
+  \item \( \gamma \in [0,1) \) is the discount factor,
+  \item \( \pi_{\boldsymbol{\theta}} \) is the parameterized policy,
+  \item \( \mathbf{P}_\pi^* = (\mathbf{I} - \gamma \mathbf{P}_\pi)^{-1} \) is the discounted resolvent (inverse Bellman operator),
+  \item \( \mathbf{r}_\pi \in \mathbb{R}^{|\mathcal{S}|} \) is the reward vector under policy \( \pi \).
+\end{itemize}
+
+However, the distribution over states under this discounted formulation is no longer a proper probability distribution. Instead, it is a weighted occupancy distribution that reflects how often states are visited, discounted over time. Formally, this state distribution is:
+\[
+\mu_{\gamma}(s) = (1 - \gamma) \sum_{t=0}^{\infty} \gamma^t \Pr(S_t = s),
+\]
+which corresponds to a \emph{geometric distribution} over state visitation (trial until first success). This reflects that recent states are weighted more heavily than distant ones.
+
+\subsection{How to Sample a State from the Discounted Distribution}
+Let \( \widetilde{P}^{\gamma}_{\pi} \propto (1 - \gamma) P^{\gamma}_{\pi} \) denote the normalized discounted state distribution. To sample a single state \( S \sim \widetilde{P}^{\gamma}_{\pi} \), follow this procedure:
+\begin{enumerate}
+    \item Sample a length \( L \sim \text{Geo}(1 - \gamma) \), representing the number of steps to run the episode. This reflects the discounted weighting of time steps.
+    \item Run an episode (trajectory) from \( t = 0 \) to \( t = L - 1 \) using the current policy \( \pi_{\boldsymbol{\theta}} \).
+    \item Let the sampled state be:
+    \[
+    S_{L-1}.
+    \]
+    All previous states can be discarded. However, in practice, people often use \emph{all} states \( \{S_0, \dots, S_{L-1}\} \) to construct an unbiased gradient estimate more efficiently.
+\end{enumerate}
+
+This method allows sampling from the discounted state distribution using a simple rejection-free procedure based on the geometric distribution.
+
+\subsection{Gradient of the Discounted Performance}
+When differentiating the performance objective with respect to parameters \( \boldsymbol{\theta} \), a challenge arises:
+\begin{itemize}
+    \item The derivative of the state distribution \( \mu_{\gamma}(s) \) with respect to \( \boldsymbol{\theta} \) is unknown.
+    \item This term is not sampling friendly, which makes gradient estimation difficult.
+\end{itemize}
+
+To illustrate the problem, consider the gradient of the value function from a start state \( s_0 \):
+\[
+\nabla_{\boldsymbol{\theta}} v^{\pi}_{\gamma}(s_0)
+= \sum_{s \in \mathcal{S}} (\mathbf{P}_{\pi}^{\gamma})(s \mid s_0) \sum_{a \in \mathcal{A}} q_{\gamma}^{\pi}(s, a) \nabla_{\boldsymbol{\theta}} \log \pi(a \mid s; \boldsymbol{\theta}).
+\]
+This formulation shows two key difficulties:
+\begin{itemize}
+    \item The discounted transition matrix \( \mathbf{P}_{\pi}^{\gamma} \) is not a proper probability distribution over states because its rows do not sum to 1.
+    \item The dependency on future state visitation makes \( \nabla_{\boldsymbol{\theta}} v^{\pi}_{\gamma}(s_0) \) nontrivial to estimate via sampling, since it relies on \textbf{off-policy-like expectations} over future trajectories.
+\end{itemize}
+
+Despite this, we can still derive a useful result. The \textbf{Policy Gradient Theorem} states:
+\[
+\nabla J(\boldsymbol{\theta}) \propto \sum_{s} \mu_{\gamma}(s) \sum_{a} \nabla_{\boldsymbol{\theta}} \pi(a|s; \boldsymbol{\theta}) q^{\pi}(s,a),
+\]
+where the gradient does \emph{not} involve the derivative of the state distribution \( \mu_{\gamma}(s) \), and the proportionality constant depends on \( \gamma \).
+
+This result allows us to construct stochastic estimates of the policy gradient using sample trajectories.
+
+\subsection{Sampling-Friendly Estimation}
+Using the identity:
+\[
+\nabla_{\boldsymbol{\theta}} \pi(a \mid s; \boldsymbol{\theta}) = \pi(a \mid s; \boldsymbol{\theta}) \nabla_{\boldsymbol{\theta}} \log \pi(a \mid s; \boldsymbol{\theta}),
+\]
+we can rewrite the gradient as:
+\[
+\nabla J(\boldsymbol{\theta}) \propto \mathbb{E}_{\pi} \left[ q^{\pi}(s,a) \nabla_{\boldsymbol{\theta}} \log \pi(a \mid s; \boldsymbol{\theta}) \right],
+\]
+which forms the basis of REINFORCE and other policy gradient algorithms.
+
+\subsection{REINFORCE with Discounted Return}
+In practice, for episodic tasks, we define the update rule as:
+\[
+\boldsymbol{\theta}_{t+1} = \boldsymbol{\theta}_t + \alpha \gamma^t G_t \nabla_{\boldsymbol{\theta}} \log \pi(A_t \mid S_t; \boldsymbol{\theta}_t),
+\]
+where \( G_t = \sum_{k=t}^{T} \gamma^{k-t} R_{k+1} \) is the sampled discounted return. This form emphasizes the time-weighted contribution of each reward.
+
+\subsection{Geometric Distribution Intuition}
+The discounted state distribution \( \mu_{\gamma}(s) \) resembles a geometric distribution with success probability \( 1 - \gamma \), as it defines the likelihood of visiting a state within discounted trials. This interpretation helps justify the form of the weighting in the gradient expression.
+
+\subsection{Conclusion} 
+Although the discounted reward setting does not induce a proper probability distribution over states, the policy gradient theorem provides a powerful result that avoids this difficulty by leveraging the structure of the expected return and enabling sampling-based learning algorithms like REINFORCE.

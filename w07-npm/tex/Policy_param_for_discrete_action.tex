@@ -1,0 +1,52 @@
+\section{Policy Parameterization for Discrete Action Spaces}
+
+In reinforcement learning with discrete action spaces, we often represent the policy \( \pi(a \mid s; \boldsymbol{\theta}) \) using a parameterized categorical distribution. One commonly used approach is the **softmax (Gibbs/Boltzmann) parameterization**, where the probability of selecting an action \( a \) in state \( s \) is defined as:
+
+\[
+\pi(a \mid s; \boldsymbol{\theta}) = \frac{\exp(\boldsymbol{\theta}^\top \phi(s, a))}{\sum_{a' \in A} \exp(\boldsymbol{\theta}^\top \phi(s, a'))},
+\]
+
+where:
+\begin{itemize}
+    \item \( \phi(s, a) \in \mathbb{R}^d \) is a feature vector for state-action pair \( (s, a) \),
+    \item \( \boldsymbol{\theta} \in \mathbb{R}^d \) is the parameter vector,
+    \item \( \mathcal{A} \) is the set of all possible discrete actions.
+\end{itemize}
+
+This softmax function ensures that:
+\begin{itemize}
+    \item Each action probability is positive: \( \pi(a \mid s; \boldsymbol{\theta}) > 0 \),
+    \item The probabilities sum to one: \( \sum_{a \in A} \pi(a \mid s; \boldsymbol{\theta}) = 1 \).
+\end{itemize}
+
+The distribution \( \pi(\cdot \mid s; \boldsymbol{\theta}) \) is also known as a **categorical distribution** over actions, and this formulation aligns with the Gibbs distribution in statistical physics, which favors higher-scoring actions (higher \( \boldsymbol{\theta}^\top \phi(s, a) \)).
+
+\paragraph{Alternative Interpretation: Preference-Based Parameterization.}
+Sutton (2018) also presents a preference-based view of softmax policy parameterization, where each action \( a \) is assigned a scalar preference \( H_t(a) \in \mathbb{R} \). These preferences determine the policy via:
+
+\[
+\pi_t(a) = \frac{\exp(H_t(a))}{\sum_{b \in A} \exp(H_t(b))}.
+\]
+
+Only the relative differences between preferences matter. For example, adding a constant to all \( H_t(a) \) values has no effect on the resulting action probabilities. This highlights the invariance property of the softmax formulation. Initially, all preferences are often set equally (e.g., \( H_1(a) = 0 \)) to induce uniform exploration.
+
+\paragraph{Connection to Logistic Function.}
+In the case of two actions \( a_1 \) and \( a_2 \), this softmax reduces to a logistic (sigmoid) function:
+
+\[
+\pi(a_1) = \frac{1}{1 + \exp(-(H(a_1) - H(a_2)))},
+\]
+
+which is widely used in statistics and neural networks. This emphasizes the connection between policy gradients and logistic regression models.
+
+\paragraph{Gradient of the Softmax Policy.} 
+When applying policy gradient methods, we need the gradient of the log-policy:
+
+\[
+\nabla_{\boldsymbol{\theta}} \log \pi(a \mid s; \boldsymbol{\theta}) = \phi(s, a) - \sum_{a' \in A} \pi(a' \mid s; \boldsymbol{\theta}) \phi(s, a').
+\]
+
+This expression follows from the quotient rule and is essential for computing the policy gradient in REINFORCE and actor-critic methods.
+
+\paragraph{Interpretation.}
+This softmax parameterization encourages exploration: even suboptimal actions have non-zero probability of being selected. The scale of \( \boldsymbol{\theta}^\top \phi(s, a) \) can influence how deterministic or stochastic the policy behaves.
