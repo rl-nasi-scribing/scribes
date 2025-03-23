@@ -1,8 +1,8 @@
-PWD c:/Users/PC/Documents/ML_RL/New folder/scribe/w07-npm/tex
+PWD c:/Users/moham/OneDrive/Desktop/MRL/scribe-w6/w07-npm/tex
 INPUT c:/texlive/2024/texmf.cnf
 INPUT c:/texlive/2024/texmf-dist/web2c/texmf.cnf
 INPUT c:/texlive/2024/texmf-var/web2c/pdftex/pdflatex.fmt
-INPUT c:/Users/PC/Documents/ML_RL/New folder/scribe/w07-npm/tex/main.tex
+INPUT c:/Users/moham/OneDrive/Desktop/MRL/scribe-w6/w07-npm/tex/main.tex
 OUTPUT main.log
 INPUT c:/texlive/2024/texmf-dist/tex/latex/base/article.cls
 INPUT c:/texlive/2024/texmf-dist/tex/latex/base/article.cls
@@ -503,6 +503,11 @@ INPUT c:/texlive/2024/texmf-dist/fonts/tfm/adobe/times/ptmri8r.tfm
 INPUT c:/texlive/2024/texmf-dist/fonts/vf/public/dutchcal/dutchcal-r.vf
 INPUT c:/texlive/2024/texmf-dist/fonts/tfm/public/cm/cmr10.tfm
 INPUT c:/texlive/2024/texmf-dist/fonts/tfm/public/dutchcal/rdutchcalr.tfm
+INPUT ./Difference.tex
+INPUT ./Difference.tex
+INPUT ./Difference.tex
+INPUT ./Difference.tex
+INPUT Difference.tex
 INPUT main.aux
 INPUT ./main.out
 INPUT ./main.out
@@ -515,6 +520,7 @@ INPUT c:/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmmib10.pfb
 INPUT c:/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cmextra/cmmib5.pfb
 INPUT c:/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cmextra/cmmib7.pfb
 INPUT c:/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb
+INPUT c:/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmr5.pfb
 INPUT c:/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb
 INPUT c:/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb
 INPUT c:/texlive/2024/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy5.pfb

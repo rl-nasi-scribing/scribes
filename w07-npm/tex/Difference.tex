@@ -1,0 +1,180 @@
+\section{Difference}
+
+\subsection{Difference in State Distribution and Type of Reward}
+
+In many decision-making problems, there is an important distinction between two approaches for evaluating rewards:
+
+\begin{itemize}
+    \item \emph{Average reward}: This approach is often associated with a stationary state distribution. Over a long time horizon, the state distribution may converge to a stationary distribution, and the policy's performance is measured by the average reward achieved under that distribution.
+    \item \emph{Discounted reward}: This method applies a discount factor \(\gamma\) to future rewards. It can be interpreted as a process where the number of steps follows a Geometric distribution with parameter \((1-\gamma)\). In other words, there is a probability \((1-\gamma)\) of terminating at each step, thus placing more emphasis on recent states.
+\end{itemize}
+
+Additionally, the reward function itself can depend on either the state \((s)\) or the state-action pair \((s,a)\):
+\[
+  r(s,a) 
+  \quad \text{or} \quad 
+  r(s).
+\]
+Some algorithms assume that the reward depends solely on the state, while others allow it to depend on both state and action. These differences impact how the policy \(\pi\) is evaluated.
+
+\subsection{Dependency of the Optimal Policy on the Initial State Distribution}
+
+The optimal policy \(\pi^*\) is often defined by taking into account the expectation over the \textbf{initial state distribution} \(p\):
+\[
+  \pi^*(p) 
+  \;=\; 
+  \argmax_{\pi} 
+  \; \mathbb{E}_{S_0 \sim p} \bigl[ V^\pi(S_0) \bigr],
+\]
+where \(V^\pi(S_0)\) is the value of the policy \(\pi\) starting from state \(S_0\).
+
+For instance, if the initial state distribution is \emph{uniform}:
+\[
+  p_{\text{uniform}}(s) 
+  \;=\; 
+  \frac{1}{|\mathcal{S}|},
+\]
+the resulting optimal policy, \(\pi^*_{\text{uniform}}\), may be different from \(\pi^*_p\) when a different initial distribution is used. For example, consider an initial distribution such as
+\[
+  p = [1,\, 0,\, 0,\, \dots] 
+  \quad \text{or} \quad 
+  p = [0,\, 1,\, 0,\, \dots],
+\]
+which represents a probability of 1 for starting in one specific state and 0 for all others. These variations lead to different optimal policies because the weight or emphasis on each initial state changes.
+
+It is common to denote the optimal policy according to the initial distribution used:
+\[
+  \pi^*_0 \quad (\text{for a particular initial distribution}), 
+  \quad
+  \pi^*_{p} \quad (\text{for the initial distribution } p).
+\]
+If \(p\) is modified, the optimization criterion changes accordingly, and the corresponding optimal policy \(\pi^*_p\) may also change.
+
+\section{Variance Reduction in Policy Gradient Methods}
+
+This set of notes addresses a key issue in policy gradient methods: while the standard estimator of
+\[
+  \mathbb{E}\bigl[q(S,A) \,\nabla \log \pi(A \mid S)\bigr]
+\]
+is unbiased, it can have high variance. Two common strategies to reduce variance without introducing bias are:
+\begin{enumerate}
+    \item Using a \textbf{baseline} (or control variate) that is independent of the action.
+    \item Employing an \textbf{actor-critic} approach, which leverages learned value functions.
+\end{enumerate}
+
+Below is a more detailed breakdown of the main ideas from the notes:
+
+\subsection{High Variance in Policy Gradient Estimators}
+In policy gradient methods (e.g., REINFORCE), an update often takes the form
+\[
+  \nabla J(\theta) 
+  \approx 
+  \bigl(G_t\bigr) \,\nabla \log \pi(A_t \mid S_t; \theta),
+\]
+where \(G_t\) is an unbiased sample of the return (or an estimate of \(Q^\pi(S_t, A_t)\)). Although this estimator is unbiased, it may have large variance, making convergence slow or unstable.
+
+\subsection{Baseline as a Control Variate}
+
+\paragraph{Motivation.}
+A \emph{control variate} is a technique from statistics used to reduce the variance of an estimator without adding bias. In the context of policy gradients, the most common control variate is a \emph{baseline} \(b(S)\) that does not depend on the action \(A\). Because it is independent of the action, subtracting it from \(Q^\pi(S,A)\) leaves the expected gradient unbiased:
+\[
+  \mathbb{E}\bigl[(Q^\pi(S,A) - b(S)) \,\nabla \log \pi(A \mid S)\bigr]
+  \;=\;
+  \mathbb{E}\bigl[Q^\pi(S,A)\,\nabla \log \pi(A \mid S)\bigr]
+  \;-\;
+  \mathbb{E}\bigl[b(S)\,\nabla \log \pi(A \mid S)\bigr].
+\]
+Since \(\mathbb{E}_{A\sim \pi}[\nabla \log \pi(A \mid S)] = 0\), the second term disappears, thus leaving the estimator unbiased. However, the variance can be significantly reduced by a good choice of \(b(S)\).
+
+\paragraph{Example: Advantage Function.}
+One common baseline is \(V^\pi(S)\), the state value function. Substituting \(b(S) = V^\pi(S)\) yields:
+\[
+  Q^\pi(S,A) - V^\pi(S) 
+  \;=\;
+  A^\pi(S,A),
+\]
+the \emph{advantage function}. The advantage \(A^\pi(S,A)\) indicates how much better or worse an action \(A\) is relative to the average value of state \(S\).
+
+\subsection{Actor-Critic and Temporal-Difference (TD) Learning}
+
+\paragraph{Actor-Critic.}
+An \emph{actor-critic} method combines:
+\begin{itemize}
+    \item An \emph{actor} that updates the policy parameters (\(\theta\)) via gradient ascent.
+    \item A \emph{critic} that estimates value functions (e.g., \(V^\pi\) or \(Q^\pi\)) used as baselines to reduce variance.
+\end{itemize}
+Because the critic can learn \(V^\pi(S)\) (or \(Q^\pi(S,A)\)) online using data, it provides an adaptive baseline that improves over time, helping the actor’s updates become more stable.
+
+\paragraph{Temporal-Difference (TD) as an Unbiased Estimator.}
+In many actor-critic methods, the critic uses \emph{temporal-difference learning} to update its value function. A TD target for \(V^\pi(S)\) might be:
+\[
+  V^\pi(S_t) 
+  \leftarrow 
+  V^\pi(S_t) + \alpha \bigl(R_{t+1} + \gamma V^\pi(S_{t+1}) - V^\pi(S_t)\bigr).
+\]
+Although the single-step TD target \(\bigl(R_{t+1} + \gamma V^\pi(S_{t+1})\bigr)\) can introduce bias in certain settings, under typical assumptions (e.g., continuing tasks with a fixed policy), it converges to the true value function and thus serves as an \emph{unbiased estimator} in the limit. In practice, it also helps reduce variance compared to full Monte Carlo returns.
+
+\subsection{Putting It All Together}
+
+\begin{itemize}
+    \item \textbf{Baseline/Control Variate (BCV)}: Subtracting a baseline that does not depend on \(A\) keeps the estimator unbiased and can significantly reduce variance. The most popular baseline is the state value \(V^\pi(S)\), leading to the advantage function \(A^\pi(S,A)\).
+    \item \textbf{Actor-Critic}: Combines the idea of a parameterized policy (actor) with a learned value function (critic). The critic’s estimates serve as a baseline, and temporal-difference methods often keep the critic’s estimate updated efficiently.
+    \item \textbf{Variance-Bias Trade-off}: While Monte Carlo returns provide unbiased estimates of \(Q^\pi(S,A)\), they can have high variance. TD methods reduce variance (and sometimes introduce small bias), but typically converge faster in practice. Carefully chosen baselines and TD updates strike a balance between variance and bias, improving overall performance of policy gradient algorithms.
+\end{itemize}
+
+\subsection{Using a Parametric Critic to Reduce Variance Further}
+
+Beyond the basic idea of subtracting a baseline \(b(S)\) (which does not depend on the action \(A\)), many policy gradient methods incorporate a \emph{parametric critic} to approximate the value function or the action-value function. Let \(w\) be the parameters of the critic, which could approximate:
+\[
+  Q_{\text{critic}}(S,A; w) 
+  \quad \text{or} \quad
+  V_{\text{critic}}(S; w).
+\]
+This parametric approximation further refines the variance-reduction approach:
+
+\begin{enumerate}
+    \item \textbf{Baseline via a Parametric Value Function.}
+    If we choose \(b(S) = V_{\text{critic}}(S; w)\) as the baseline, then the policy gradient update becomes
+    \[
+      \nabla_{\theta} J(\theta) 
+      \approx 
+      \bigl(Q^\pi(S,A) - V_{\text{critic}}(S; w)\bigr)\,\nabla_{\theta}\log \pi_\theta(A \mid S),
+    \]
+    where \(\bigl(Q^\pi(S,A) - V_{\text{critic}}(S; w)\bigr)\) is an approximate advantage. In practice, \(Q^\pi(S,A)\) itself is often replaced by the critic’s estimate \(Q_{\text{critic}}(S,A; w)\) or by a sample return. Substituting this yields
+    \[
+      \bigl(Q_{\text{critic}}(S,A; w) - V_{\text{critic}}(S; w)\bigr) 
+      \;=\; 
+      A_{\text{critic}}(S,A; w),
+    \]
+    an \emph{advantage} estimate based on the critic.
+
+    \item \textbf{Actor-Critic: Single-Sample Updates.}
+    In an \emph{actor-critic} setup, each transition \((S, A, R, S')\) can be used to:
+    \begin{itemize}
+        \item Update the critic parameters \(w\) (e.g., via temporal-difference learning), aiming to improve the approximation \(Q_{\text{critic}}(S,A; w)\) or \(V_{\text{critic}}(S; w)\).
+        \item Update the actor parameters \(\theta\), using the critic’s estimates to form a low-variance gradient update:
+        \[
+          \delta_t 
+          \;=\; 
+          R + \gamma Q_{\text{critic}}(S', A'; w) \;-\; Q_{\text{critic}}(S,A; w)
+        \]
+        (for an action-value-based critic), or a similar TD error for a state-value-based critic. This TD error \(\delta_t\) helps correct both the critic’s estimate and provides a local advantage-like signal for the actor.
+    \end{itemize}
+    Since the critic is updated continually, it progressively provides more accurate estimates of \(Q^\pi(S,A)\) or \(V^\pi(S)\), which in turn reduces the variance of the actor’s policy gradient updates.
+
+    \item \textbf{Combining Baseline and Actor-Critic.}
+    We often employ \emph{both} a baseline and an actor-critic approach:
+    \begin{itemize}
+        \item The \textbf{baseline} concept ensures that subtracting something like \(V_{\text{critic}}(S; w)\) does not introduce bias but can substantially reduce variance.
+        \item The \textbf{actor-critic} framework ensures that this baseline (or the action-value approximation) is adaptively learned via single-sample updates (e.g., using TD methods).
+    \end{itemize}
+    Hence, instead of only subtracting a static baseline, we can directly learn and refine \(Q_{\text{critic}}(S,A; w)\) (or \(V_{\text{critic}}(S; w)\)) to generate the advantage term \(\delta\). This approach typically converges faster and is more stable than using Monte Carlo returns for the baseline.
+
+    \item \textbf{Overall Benefit of Parametric Critic.}
+    By maintaining a parameterized function \(Q_{\text{critic}}(S,A; w)\) or \(V_{\text{critic}}(S; w)\), the method can:
+    \begin{itemize}
+        \item Incorporate single-step or multi-step TD updates, which often have lower variance compared to full returns.
+        \item Provide continuous improvement in baseline quality, thus continually reducing variance in the policy gradient.
+        \item Combine seamlessly with neural network approximations, allowing scalability to large state-action spaces.
+    \end{itemize}
+\end{enumerate}
