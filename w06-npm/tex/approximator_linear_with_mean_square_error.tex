@@ -1,15 +1,13 @@
 \section{Linear Function Approximation with (Weighted) Mean Squared Error}
 
 In this scheme, we'll have \(p^\star(s)\), a stationary distribution over states that assigns a weight to each state. Note that we use it instead of uniform weighting, i.e., \(\frac{1}{|S|}\), as some states may be visited less frequently or not at all by the agent. Then, we define the weighted mean squared error (MSE) as:
-\[
-e_{\text{MS}}(\mathbf{w}) 
-= \mathbb{E}_{s \sim p^\star(s)}\left[\left(v_\pi(s) - \hat{v}(s;\mathbf{w})\right)^2\right].
-\]
-In discrete state spaces, we can write it down as:
-\[
-e_{\text{MS}}(\mathbf{w})
-\;=\; \sum_{s \in \mathcal{S}} p^\star(s)\,\bigl(v_\pi(s) - \hat{v}(s;\mathbf{w})\bigr)^2.
-\]
+\begin{align}
+    e_{\text{MS}}(\mathbf{w}) 
+    &= \mathbb{E}_{s \sim p^\star(s)}\left[\left(v_\pi(s) - \hat{v}(s;\mathbf{w})\right)^2\right] \notag \\
+    &= \sum_{s \in \mathcal{S}} p^\star(s)\,\bigl(v_\pi(s) - \hat{v}(s;\mathbf{w})\bigr)^2 
+    \tag*{\text{(In discrete state spaces)}}
+\end{align}
+
 \[
 e_{\text{MS}}(\mathbf{w})
 \;=\; \sum_{s \in \mathcal{S}} p^\star(s)\,\bigl(v_\pi(s) - \mathbf{w}^\top \mathbf{f}(s)\bigr)^2.
