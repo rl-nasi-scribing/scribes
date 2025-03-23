@@ -1,0 +1,71 @@
+\section{Gradient Ascent for Policy Improvement}
+\label{sec:gradient_ascent}
+
+As mentioned in the previous chapters, one of the way to achieve inexact policy improvement is via \emph{gradient ascent}. Concretely, if $v(\theta)$ denotes the performance measure (e.g., expected return) of a parameterized policy $\pi_\theta$, then a gradient ascent step can be written as:
+\begin{equation}
+  \theta \;\leftarrow\; \theta \;+\; \alpha \,\nabla_\theta \,v(\theta),
+  \label{eq:gradient_ascent_update}
+\end{equation}
+where $\alpha$ is a step-size (learning rate) and $\nabla_\theta v(\theta)$ is the gradient of the performance measure with respect to the policy parameters $\theta$. By moving in the direction of the gradient, we \emph{increase} $v(\theta)$, thus improving the policy in an inexact yet systematic manner.
+
+\subsection{Policy Gradient Formula}
+\label{sec:policy_gradient_formula}
+
+A key question is how to compute $\nabla_\theta \, v(\theta)$ when the policy $\pi_\theta(a \mid s)$ is stochastic. Under certain regularity conditions, the \emph{policy gradient theorem} states:
+\begin{align}
+  \nabla_\theta \,v(\theta) 
+  &= \sum_{s \in \mathcal{S}} d^{\pi_\theta}(s) \sum_{a \in \mathcal{A}} 
+     q^{\pi_\theta}(s, a)\,\nabla_\theta \,\pi_\theta(a \mid s) 
+  \label{eq:pg_theorem_original}\\[6pt]
+  &= \sum_{s \in \mathcal{S}} d^{\pi_\theta}(s) \sum_{a \in \mathcal{A}}
+     q^{\pi_\theta}(s, a)\,\pi_\theta(a \mid s)\,\nabla_\theta \log \pi_\theta(a \mid s),
+  \label{eq:pg_theorem_log}
+\end{align}
+where:
+\begin{itemize}
+  \item $d^{\pi_\theta}(s)$ is the (stationary) distribution of states when following policy $\pi_\theta$.
+  \item $q^{\pi_\theta}(s, a)$ is the action-value function under $\pi_\theta$, i.e., the expected return starting from state $s$, taking action $a$, and thereafter following $\pi_\theta$.
+  \item $\log \pi_\theta(a \mid s)$ is used to transform $\nabla_\theta \,\pi_\theta(a \mid s)$ into a form more amenable to sampling.
+\end{itemize}
+In words, to compute the gradient of the policy performance, we weight each action $a$ in state $s$ by both its likelihood under $\pi_\theta$ and its corresponding value $q^{\pi_\theta}(s,a)$. 
+
+\subsection{Sampling-Based (Unbiased) Estimation}
+\label{sec:sampling_estimation}
+
+Directly summing over all states $s \in \mathcal{S}$ and actions $a \in \mathcal{A}$ is often intractable, especially in large or continuous spaces. Instead, we typically approximate \eqref{eq:pg_theorem_log} via samples from the current policy $\pi_\theta$. That is, we collect trajectories $\{(s_t, a_t, r_t)\}$ by interacting with the environment using $\pi_\theta$, and then estimate:
+\begin{equation}
+  \nabla_\theta \,v(\theta) 
+  \;\approx\; 
+  \frac{1}{N} \sum_{i=1}^{N} \Bigl[
+     q^{\pi_\theta}\bigl(s_i, a_i\bigr)
+     \,\nabla_\theta \log \pi_\theta\bigl(a_i \mid s_i\bigr)
+  \Bigr],
+  \label{eq:sample_estimate}
+\end{equation}
+where $N$ is the number of sampled state-action pairs (or episodes). 
+
+If $q^{\pi_\theta}(s_i, a_i)$ is itself replaced by an unbiased return estimate (e.g., Monte Carlo returns, bootstrapped estimates, or advantage functions), then \eqref{eq:sample_estimate} is an \emph{unbiased} stochastic gradient of $v(\theta)$. The entire procedure is thus referred to as \emph{stochastic gradient ascent (SGA)}. 
+
+\subsection{Biased vs.\ Semi-Stochastic Approaches}
+\label{sec:biased_approx}
+
+In practice, some approximations introduce bias. For instance, $q^{\pi_\theta}(s,a)$ may be approximated by a learned critic or truncated returns. Moreover, during learning, $\theta$ may change faster than we can gather fully on-policy samples. This mismatch between the policy used to gather data and the updated policy parameters can create a \emph{semi-stochastic} gradient approach. While theoretically these approximations may introduce some bias, in many real-world tasks they are sufficiently accurate to yield strong performance and stable learning.
+
+\subsection{Putting It All Together}
+\label{sec:ga_conclusion}
+
+The gradient ascent update rule for inexact policy improvement can be summarized as:
+\begin{equation}
+  \theta_{k+1} 
+  \;=\; 
+  \theta_k \;+\; \alpha \,\widehat{\nabla_\theta v(\theta_k)},
+  \label{eq:ga_inexact_update}
+\end{equation}
+where $\widehat{\nabla_\theta v(\theta_k)}$ is an approximation of the true gradient, computed via sampled trajectories or batches of experience. This approach has the following key characteristics:
+
+\begin{itemize}
+  \item Inexact but Monotonically Improving: Each update step aims to increase $v(\theta)$, though not necessarily by an exact or optimal amount.
+  \item Unbiased or Semi-Unbiased Estimates: Depending on how $q^{\pi_\theta}(s,a)$ is estimated, the gradient update may be unbiased (e.g., Monte Carlo returns) or partially biased (e.g., bootstrapped estimates, off-policy data).
+  \item Computational Feasibility: Sampling-based methods are often the only viable approach in high-dimensional or continuous RL problems.
+  \item Compatibility with Practical Hyperparameters: Even if the procedure is not strictly on-policy or if there is some mismatch in distributions, these methods still tend to work well in practice, especially with appropriate hyperparameter tuning.
+\end{itemize}

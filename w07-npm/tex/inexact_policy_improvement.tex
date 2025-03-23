@@ -1,0 +1,62 @@
+\section{Policy Improvement in an Inexact Way}
+\label{sec:policy_improvement_inexact}
+
+In reinforcement learning (RL), the ultimate goal is to find a policy $\pi$ that maximizes the agent's reward, such as the discounted sum of rewards, average reward per time step, or total reward. A common approach is to iteratively improve an existing policy $\pi^k$ to obtain a new policy $\pi^{k+1}$ such that
+\[
+  v(\pi^{k+1}) \;\ge\; v(\pi^k),
+\]
+where $v(\pi)$ denotes the value (under some optimality criterion) of policy $\pi$. 
+
+In many practical scenarios, we do not fully solve for an optimal policy at each iteration; instead, we perform \emph{inexact} or partial improvements. As long as these updates monotonically increase or maintain the policy value, the overall process can converge to a better policy over time. 
+
+\subsection{Policy Gradient Methods}
+\label{sec:policy_gradient}
+
+In RL, one popular realization of inexact policy improvement is via \emph{policy gradient methods}. The idea is to perform gradient \emph{ascent} on the objective function  $v_x(\pi)$ 
+where $x$ indicates the chosen optimality criterion (e.g., discounted return, average reward, total reward, or bias). Concretely, we seek
+\[
+  \nabla_\pi \, v_x(\pi) \;\;\; \text{(or its approximation)},
+\]
+and then update the policy in the direction of this gradient to increase performance:
+\[
+  \pi^{k+1} \;\leftarrow\; \pi^k \;+\; \alpha \,\nabla_\pi \,v_x(\pi^k),
+\]
+where $\alpha$ is a step size (learning rate). 
+
+A direct application of this concept, called \emph{direct policy parameterization}, attempts to compute partial derivatives of $v_x(\pi)$ with respect to the \emph{policy} $\pi$ itself. However, this approach can be difficult to use in practice because:
+
+\begin{itemize}
+  \item Policies may not have a simple, differentiable form if they are defined implicitly (e.g., large tables or non-differentiable structures).
+  \item Directly working in the space of all possible policies can be extremely high-dimensional and unstructured, making optimization unwieldy.
+\end{itemize}
+
+These challenges motivate an alternative known as \emph{explicit policy parameterization}.
+
+\section{Motivation for Explicit Policy Parameterization}
+\label{sec:explicit_param}
+
+To address the difficulties of direct policy parameterization, we introduce a parameter vector 
+\[
+  \theta \;\in\; \Theta \subseteq \mathbb{R}^d,
+\]
+where $d$ is the dimension of the parameter space. This parameter vector defines a \emph{family} of policies:
+\[
+  \pi_\theta(a \mid s),
+\]
+so that the value of the policy can be written as 
+\[
+  v(\pi_\theta) \;=\; v(\theta).
+\]
+By focusing on $\theta$, we transform the problem of improving $\pi$ into the (often more tractable) problem of optimizing $\theta$ via gradient ascent:
+\[
+  \theta^{k+1} \;\leftarrow\; \theta^k \;+\; \alpha \,\nabla_\theta \,v(\theta^k).
+\]
+This shift from direct policy parameterization to exact policy parameterization has several advantages:
+
+\begin{enumerate}
+  \item High-Dimensional Function Approximation: Using neural networks or other flexible approximators for $\pi_\theta$ allows us to represent complex policies that can generalize well across large state spaces.
+  \item Systematic Exploration Control: Stochastic parameterizations can naturally incorporate an exploration mechanism (similar in spirit to $\varepsilon$-greedy), enabling more principled control over the exploration-exploitation trade-off.
+  \item Compatibility with Gradient-Based Optimization: Once the policy is explicitly parameterized and differentiable, powerful optimization algorithms can be applied. Methods such as Proximal Policy Optimization (PPO), Trust Region Policy Optimization (TRPO), and other variants can be readily used.
+  \item Empirical Success in State-of-the-Art (SOTA) RL: Many of the best-performing RL algorithms in continuous control and high-dimensional settings rely on explicit policy parameterization. These algorithms have shown remarkable success in benchmarks such as robotic control tasks and complex games.
+\end{enumerate}
+
