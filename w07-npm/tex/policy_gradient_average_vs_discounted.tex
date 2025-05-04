@@ -1,0 +1,42 @@
+\section{Policy Gradient: Average vs Discounted}
+\label{sec:policy_gradient_average_vs_discounted}
+
+In comparing average‐reward and discounted‐reward policy‐gradient methods, two key differences are:
+
+\subsection{Sampling Distributions}
+
+\begin{description}
+  \item[Average‐reward:]  
+    \[
+      S\sim d^{\ast}_{\pi}\
+      \quad
+      A\sim\pi(\cdot\mid S).
+    \]
+
+  \item[Discounted‐reward:]  
+    \[
+      T_{\max}\sim\mathrm{Geo}(1-\gamma),
+      \quad
+      S\sim P_{\pi}^{\gamma}(\cdot\mid s_{0}),
+      \quad
+      A\sim\pi(\cdot\mid S).
+    \]
+\end{description}
+
+\subsection{Dependence on the Initial State}
+
+\begin{itemize}
+  \item \textbf{Average‐reward optimal policy:}
+    \[
+      \pi^{\star}_{g}
+      = \arg\max_{\pi}\,v_g(\pi)
+    \]
+    is \emph{uniformly optimal} across all start states in a unichain MDP — it does not depend on any particular initial distribution.
+
+  \item \textbf{Discounted‐reward optimal policy:}
+    \[
+      \pi^{\star}_{\gamma}
+      = \arg\max_{\pi}\;\mathbb{E}_{S_{0}\sim p^{0}}\bigl[V_{\gamma}(\pi,S_{0})\bigr]
+    \]
+    generally \emph{depends} on the chosen initial‐state distribution \(p^{0}\).  Different \(p^0\) can yield different optimal \(\pi^{\ast}_\gamma\).
+\end{itemize}

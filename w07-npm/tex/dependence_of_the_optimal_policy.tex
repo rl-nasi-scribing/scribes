@@ -1,13 +1,14 @@
-\section{Dependence of the Optimal Policy on the Initial State Distribution}
+\subsection{Dependence of the Optimal Policy on the Initial State Distribution}
 
-We consider a Markov Decision Process (MDP)
+Consider a Markov Decision Process (MDP) in discounted reward optimality criterion, which is defined by the tuple
 \[
-\bigl(\mathcal{S},\,\mathcal{A},\,P,\,r,\,\gamma,\,p^0\bigr),
+\bigl(\mathcal{S},\,\mathcal{A}, \mathcal{T}, \,P,\,r,\,\gamma,\,p^0\bigr),
 \]
 where
 \begin{itemize}
   \item $\mathcal{S}$ is the finite set of states,
   \item $\mathcal{A}$ is the finite set of actions,
+  \item $\mathcal{T}$ is the time set,
   \item $P(s' \mid s,a)$ is the transition kernel,
   \item $r(s,a)$ (or $r(s)$) is the (possibly discounted) reward function,
   \item $\gamma\in[0,1)$ is the discount factor,
@@ -86,8 +87,7 @@ A policy is \emph{uniformly optimal} (or \emph{non–distributional}) if it maxi
 Such a policy does not depend on $p^0$, but need not exist unless the MDP admits a single policy that is simultaneously optimal in all start states.
 
 \bigskip
-\textbf{Conclusion.}  
-The optimal policy for an MDP is \emph{not} unique in general and \emph{varies} with the initial state distribution $p^0$, unless a uniformly optimal policy exists. Hence, when designing or evaluating algorithms, one must specify (or be aware of) the assumed $p^0$ under which optimality is judged.
+The optimal policy for an MDP in discounted reward optimality criterion is \emph{not} unique in general and \emph{varies} with the initial state distribution $p^0$, unless a uniformly optimal policy exists. Hence, when designing or evaluating algorithms, one must specify (or be aware of) the assumed $p^0$ under which optimality is judged.
 
 
 

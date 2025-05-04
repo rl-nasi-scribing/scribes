@@ -1,0 +1,66 @@
+\section{Policy Gradient Theorem}
+\label{sec:policy_gradient_theorem}
+
+As discussed in previous section, the most important thing to make the gradient ascent method works is to find the $\nabla_\theta v_x(\theta)$. 
+This is where the policy gradient theorem comes in.
+
+First, let's set the optimality criterion $x$ to be the average reward or gain.
+Then, we can write the value function as:
+\begin{equation}
+    v_g(\theta) = \sum_{s \in \mathcal{S}} \sum_{a \in \mathcal{A}} p_{\pi(\theta)}^\star(s) \cdot \pi(a \mid s; \theta) \cdot r(s, a) 
+\end{equation}
+
+Introducing the gradient operator $\nabla_\theta$ at both sides:
+\begin{equation}
+    \nabla_\theta v_g(\theta) = \sum_{s \in \mathcal{S}} \sum_{a \in \mathcal{A}} p_{\pi(\theta)}^\star(s) \cdot \pi(a \mid s; \theta) \cdot r(s, a) 
+\end{equation}
+
+Exchanging the order of sum and gradient, applying gradient to $\theta$-dependent terms:
+\begin{equation}
+    \nabla_\theta v_g(\theta) = \sum_{s \in \mathcal{S}} \sum_{a \in \mathcal{A}} r(s, a) \cdot \nabla_\theta \left(p_{\pi(\theta)}^\star(s) \cdot \pi(a \mid s; \theta) \right) 
+\end{equation}
+
+Using the product rule:
+\begin{equation}
+    \nabla_\theta v_g(\theta) = \sum_{s \in \mathcal{S}} \sum_{a \in \mathcal{A}} r(s, a)  \cdot \left( \nabla_\theta p_{\pi(\theta)}^\star(s) \cdot \pi(a \mid s; \theta) + p_{\pi(\theta)}^\star(s) \cdot \nabla_\theta \pi(a \mid s; \theta) \right)
+    \label{eq:product_rule}
+\end{equation}
+
+The above equation is not sampling-friendly, because it involves the gradient of the state distribution $p_{\pi(\theta)}^\star(s)$, which is not easy to compute.
+
+Now, recall that the score function identity is defined as:
+\begin{equation}
+    \nabla_\theta \log \pi(a \mid s ; \vecb{\theta}) = \frac{\nabla \pi(a \mid s ; \vecb{\theta})}{\pi(a \mid s ; \vecb{\theta})}
+\end{equation}
+
+Using the above identity, we can rewrite the gradient of the policy as:
+\begin{equation}
+    \nabla_\theta \pi(a \mid s ; \vecb{\theta}) = \pi(a \mid s ; \vecb{\theta}) \cdot \nabla_\theta \log \pi(a \mid s ; \vecb{\theta})
+\end{equation}
+
+Utilizing the score function into \eqref{eq:product_rule}:
+\begin{equation}
+    \nabla_\theta v_g(\theta) = \sum_{s \in \mathcal{S}} \sum_{a \in \mathcal{A}} r(s, a)  \cdot \left( p_{\pi(\theta)}^\star(s) \cdot \nabla_\theta \log{p_{\pi(\theta)}^\star}(s) \cdot \pi(a \mid s; \theta) + p_{\pi(\theta)}^\star(s) \cdot \pi(a \mid s ; \vecb{\theta}) \cdot  \nabla_\theta \log \pi(a \mid s ; \vecb{\theta})\right)
+\end{equation}
+
+\begin{equation}
+    = \sum_{s \in \mathcal{S}} \sum_{a \in \mathcal{A}}  p_{\pi(\theta)}^\star(s) \cdot \pi(a \mid s ; \vecb{\theta}) \cdot r(s, a)  \cdot \left(\nabla_\theta \log{p_{\pi(\theta)}^\star}(s) + \nabla_\theta \log \pi(a \mid s ; \vecb{\theta})\right)
+\end{equation}
+
+Note that $p_{\pi(\theta)}^\star(s)$ appearing as a multiplicative term is not problematic as it can be handled under expectation. However, $\nabla_\theta \log p_{\pi(\theta)}^\star(s)$ is unknown and difficult to compute. While this form is sampling-friendly, in the RL setting $p_{\pi(\theta)}^\star(s)$ itself is unknown to the agent.
+
+To get rid of the above problem, \cite{sutton1999polgradtheorem} proposed that we can encode the $\nabla_\theta \log{p_\pi(\theta)^\star(s)}$ and $r(s,a)$ into $q_b^\pi(s, a)$:
+\begin{equation}
+    \nabla_\theta v_g(\theta) = \sum_{s \in \mathcal{S}} \sum_{a \in \mathcal{A}}  p_{\pi(\theta)}^\star(s) \cdot \pi(a \mid s ; \vecb{\theta}) \cdot q_b^\pi(s, a) \cdot \nabla_\theta \log \pi(a \mid s ; \vecb{\theta})
+\end{equation}
+
+\begin{equation}
+     = \mathbb{E}_{S \sim p_{\pi(\theta)}^\star(.), A \sim \pi(. \mid S ; \vecb{\theta})} \left[ q_b^\pi(S, A) \cdot \nabla_\theta \log \pi(A \mid S ; \vecb{\theta})\right]
+\end{equation}
+
+Remember that expectation is equivalent to mean $\mu$, thus we can get an unbiased approximation of the gradient by using sample mean $\hat{\mu}$ (which is also a random variable) and the expectation of it is equal to the mean.
+
+That $p_{\pi(\theta)}^\star$ is unknown but appears under expectation. Hence, is practice, we simply sample states from it. 
+But it just exist when $t >= t_{mix}$. Before that, we sample from $p_{\pi(\theta)}^t$, which result in a biased approximation and thus called Semi Stochastic Gradient Ascent.   
+When the sampling is obtained from the true distribution $p_{\pi(\theta)}^\star$, the approximation is unbiased, thus we can call it as Stochastic Gradient Ascent.
+

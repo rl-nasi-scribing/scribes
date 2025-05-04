@@ -1,15 +1,15 @@
 \section{Policy Parameterization for Discrete Action Spaces}
 
-In reinforcement learning with discrete action spaces, we often represent the policy \( \pi(a \mid s; \boldsymbol{\theta}) \) using a parameterized categorical distribution. One commonly used approach is the **softmax (Gibbs/Boltzmann) parameterization**, where the probability of selecting an action \( a \) in state \( s \) is defined as:
+In reinforcement learning with discrete action spaces, we often represent the policy \( \pi(a \mid s; \boldsymbol{\theta}) \) using a parameterized categorical distribution. One commonly used approach is the softmax (Gibbs/Boltzmann) parameterization, where the probability of selecting an action \( a \) in state \( s \) is defined as:
 
 \[
-\pi(a \mid s; \boldsymbol{\theta}) = \frac{\exp(\boldsymbol{\theta}^\top \phi(s, a))}{\sum_{a' \in A} \exp(\boldsymbol{\theta}^\top \phi(s, a'))},
+\pi(a \mid s; \boldsymbol{\theta}) = \frac{\exp(\boldsymbol{\theta}^\top \phi(s, a))}{\sum_{a' \in A} \exp(\boldsymbol{\theta}^\top \phi(s, a'))}, \quad \forall (s,a) \in \mathcal{S} \times \mathcal{A} 
 \]
 
 where:
 \begin{itemize}
     \item \( \phi(s, a) \in \mathbb{R}^d \) is a feature vector for state-action pair \( (s, a) \),
-    \item \( \boldsymbol{\theta} \in \mathbb{R}^d \) is the parameter vector,
+    \item \( \boldsymbol{\theta} \in \mathbb{R}^d \) is the policy parameter vector,
     \item \( \mathcal{A} \) is the set of all possible discrete actions.
 \end{itemize}
 
@@ -19,10 +19,11 @@ This softmax function ensures that:
     \item The probabilities sum to one: \( \sum_{a \in A} \pi(a \mid s; \boldsymbol{\theta}) = 1 \).
 \end{itemize}
 
-The distribution \( \pi(\cdot \mid s; \boldsymbol{\theta}) \) is also known as a **categorical distribution** over actions, and this formulation aligns with the Gibbs distribution in statistical physics, which favors higher-scoring actions (higher \( \boldsymbol{\theta}^\top \phi(s, a) \)).
+The distribution \( \pi(\cdot \mid s; \boldsymbol{\theta}) \) is also known as a categorical distribution over actions, and this formulation aligns with the Gibbs distribution in statistical physics, which favors higher-scoring actions (higher \( \boldsymbol{\theta}^\top \phi(s, a) \)).
 
-\paragraph{Alternative Interpretation: Preference-Based Parameterization.}
-Sutton (2018) also presents a preference-based view of softmax policy parameterization, where each action \( a \) is assigned a scalar preference \( H_t(a) \in \mathbb{R} \). These preferences determine the policy via:
+\textbf{Alternative Interpretation: Preference-Based Parameterization:}
+
+\cite{sutton2018reinforcement} also presents a preference-based view of softmax policy parameterization, where each action \( a \) is assigned a scalar preference \( H_t(a) \in \mathbb{R} \). These preferences determine the policy via:
 
 \[
 \pi_t(a) = \frac{\exp(H_t(a))}{\sum_{b \in A} \exp(H_t(b))}.
@@ -30,23 +31,21 @@ Sutton (2018) also presents a preference-based view of softmax policy parameteri
 
 Only the relative differences between preferences matter. For example, adding a constant to all \( H_t(a) \) values has no effect on the resulting action probabilities. This highlights the invariance property of the softmax formulation. Initially, all preferences are often set equally (e.g., \( H_1(a) = 0 \)) to induce uniform exploration.
 
-\paragraph{Connection to Logistic Function.}
-In the case of two actions \( a_1 \) and \( a_2 \), this softmax reduces to a logistic (sigmoid) function:
+\textbf{Connection to the Logistic (Sigmoid) Function}
 
+
+When there are exactly two actions, say \(a_1\) and \(a_2\), the softmax formula
 \[
-\pi(a_1) = \frac{1}{1 + \exp(-(H(a_1) - H(a_2)))},
+\pi(a_i)
+= \frac{\exp\bigl(H(a_i)\bigr)}{\exp\bigl(H(a_1)\bigr) + \exp\bigl(H(a_2)\bigr)},
+\quad i=1,2,
 \]
-
-which is widely used in statistics and neural networks. This emphasizes the connection between policy gradients and logistic regression models.
-
-\paragraph{Gradient of the Softmax Policy.} 
-When applying policy gradient methods, we need the gradient of the log-policy:
-
+reduces to the familiar sigmoid form.  For \(a_1\):
 \[
-\nabla_{\boldsymbol{\theta}} \log \pi(a \mid s; \boldsymbol{\theta}) = \phi(s, a) - \sum_{a' \in A} \pi(a' \mid s; \boldsymbol{\theta}) \phi(s, a').
+\pi(a_1)
+= \frac{\exp\bigl(H(a_1)\bigr)}{\exp\bigl(H(a_1)\bigr) + \exp\bigl(H(a_2)\bigr)}
+= \frac{1}{1 + \exp\bigl(H(a_2)-H(a_1)\bigr)}
+= \frac{1}{1 + \exp\bigl(-(H(a_1)-H(a_2))\bigr)}
+= \sigma\bigl(H(a_1)-H(a_2)\bigr),
 \]
-
-This expression follows from the quotient rule and is essential for computing the policy gradient in REINFORCE and actor-critic methods.
-
-\paragraph{Interpretation.}
-This softmax parameterization encourages exploration: even suboptimal actions have non-zero probability of being selected. The scale of \( \boldsymbol{\theta}^\top \phi(s, a) \) can influence how deterministic or stochastic the policy behaves.
+where \(\sigma(x)=1/(1+e^{-x})\) is the logistic sigmoid.

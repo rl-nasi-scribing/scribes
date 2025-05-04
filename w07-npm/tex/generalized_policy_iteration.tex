@@ -1,0 +1,67 @@
+\section{Generalized Policy Iteration}
+\label{sec:generalized_policy_iteration}
+
+As the name suggest, Generalized Policy Iteration (GPI) is a generalized version of Policy Iteration. 
+In policy iteration, there are 2 main parts: policy evaluation and policy improvement. In GPI, the generalization refers to those 2 parts, where they're computed in an inexact way.
+This enables us to advance from Dynamic Programming setting to Reinforcement Learning setting, where we can use function approximation and sampling to improve the agent's policy. In DP setting, the agent needs to know the state transition distribution p and the reward function r, while in RL setting, the agent doesn't need to know them.
+
+
+\subsection{Inexact Policy Evaluation}
+\label{sec:inexact_policy_evaluation}
+This part deals with the problem of estimating the value function of a policy $\pi$. For this, we can choose the following loss function to minimize:
+\begin{itemize}
+  \item $e_{MS}$ - Mean Squared Error, which measures the average squared difference between the estimated value function and the true value function:
+    \begin{equation}
+        e_{MS}(\vecb{w}) = \sum_{s \in \mathcal{S}} p^\star(s) \left( v(s) - \hat{v}_(s; \vecb{w}) \right)^2
+    \end{equation}
+  This also called a semi-gradient method, where it uses an approximation for the true value function using BEE that involves bootstrapping as one of the component to compute the gradient of the error. 
+  \item $e_{PB}$ - Projected Bellman Error, which measures the difference between the estimated value function and its Projected Bellman version:
+    \begin{equation}
+        e_{PB}(\vecb{w}) =  \norm{ \left( \hat{v}(\vecb{w}) - \mathbb{P} \mathbb{B} \hat{v}(\vecb{w}) \right)}^2
+    \end{equation}
+  This also called a Least Square Temporal Difference (LSTD) method.
+\end{itemize}
+
+
+\subsection{Inexact Policy Improvement}
+This part deals with modifying the policy $\pi^k$ such that the new policy $\pi^{k+1}$ is better than the previous one, i.e., $v(\pi^{k+1}) > v(\pi^{k})$.
+In RL, this can be done with policy gradient, specifically with gradient ascent method to keep adjusting the policy to maximize its value.
+Remember that gradient is having role to guide below components so that the maximization of the objective function can be reached as soon as possible:
+\begin{itemize}
+    \item Direction - where should the parameter update go
+    \item Magnitude - Not only the step size parameter, the gradient is also having the role to determine how big the step that should be taken for the parameter update. The bigger the gradient norm, the more sensitive the objective function w.r.t the change of the gradient. In other words, the bigger the norm of the gradient, the bigger the step, and vice versa.
+\end{itemize}
+
+Concretely, to do the inexact policy improvement, we could:
+\begin{enumerate}[label=\alph*]
+    \item  Find the gradient of the policy's value w.r.t the policy, i.e., $\nabla_\pi v_x(\pi^k) = \partdiff{\pi} v_x(\pi^k)$. 
+    \item Use the gradient ascent method to update the policy:
+    \begin{equation}
+        \pi^{k+1} \;\leftarrow\; \pi^k \;+\; \alpha \,\nabla_\pi \,v_x(\pi^k),
+    \end{equation}
+\end{enumerate}
+
+However, at the above method, we use direct policy parameterization, where the gradient is computed directly w.r.t the policy. 
+This method is not practical to be used in RL setting, because when the state and action space is large, then the parameter needed to represent the policy is also large (each of the state-action pair needs to be represented by a separate parameter). This makes the computation infeasible, and optimization hard to be done.
+
+As a remedy, we can use explicit policy parameterization, where we define a parameter vector $\theta \in \Theta = \mathbb{R}^{dim(\theta)}$, so that it becomes the parameter for the policy:
+\begin{equation}
+    \pi(\theta) = \pi(a \mid s; \theta)
+\end{equation}  
+
+And thus, the value of the policy can be written as:
+\begin{equation}
+    v(\pi(\theta)) = v(\theta)
+\end{equation}
+
+One example: $\pi \sim\;\mathcal{N}(\mu = 0,\,\sigma^2=\theta)$
+
+This brings several benefits:
+\begin{itemize}
+    \item We can use high-dimensional representation for the policy, e.g., using neural networks or other flexible approximators for $\pi(\theta)$ allows us to represent complex policies that can generalize well across large state spaces.
+    \item Explicit policy parameterizations can naturally incorporate an exploration mechanism (similar in spirit to $\varepsilon$-greedy).
+    \item Compatibility with gradient-based optimization: Once the policy is explicitly parameterized and differentiable, powerful optimization algorithms can be applied such as Proximal Policy Optimization (PPO) and Trust Region Policy Optimization (TRPO).
+\end{itemize}
+
+Many of the proven empirical success, State of The Art (SOTA), and best practices in RL comes from this explicit policy parameterization method, such as PPO algorithm.  
+

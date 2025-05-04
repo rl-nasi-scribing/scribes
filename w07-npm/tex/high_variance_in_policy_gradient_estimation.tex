@@ -1,10 +1,10 @@
 \section{High Variance in Policy Gradient Estimation}
 
 \subsection{Issue}
-The sample‐based estimator of the policy gradient is unbiased once the underlying Markov chain has sufficiently mixed. However, it often suffers from high variance because it draws randomness from two independent sources:
+The sample‐based estimator of the policy gradient is unbiased once the underlying Markov chain has sufficiently mixed. However, it often suffers from high variance because it draws randomness from two independent sources (random variables):
 \begin{itemize}
-  \item the initial state distribution, and
-  \item the stochastic nature of the policy.
+  \item the initial state distribution $p_\pi^\star$, and
+  \item the stochastic nature of the policy $\pi$.
 \end{itemize}
 Each of these contributes to the overall variance, which can slow or destabilize learning.
 
@@ -31,7 +31,7 @@ Building on the basic policy‐gradient theorem, we introduce a state‐dependen
 \[
 \nabla v_g(\theta)
 =
-\mathbb{E}\bigl[\{\,q^\pi(S,A)\;-\;v_b(S)\}\,\nabla_\theta\log\pi_\theta(A\mid S)\bigr]
+\mathbb{E}\bigl[\{\,q_b^\pi(S,A)\;-\;v_b(S)\}\,\nabla_\theta\log\pi_\theta(A\mid S)\bigr]
 =
 \mathbb{E}\bigl[\delta_v(S,A,S')\,\nabla_\theta\log\pi_\theta(A\mid S)\bigr].
 \]
@@ -56,8 +56,7 @@ Building on the basic policy‐gradient theorem, we introduce a state‐dependen
 
 \paragraph{Explanation}
 \begin{itemize}
-  \item The first equality shows that subtracting \(v_b(S)\) from the action‐value \(q^\pi(S,A)\) does not introduce bias, because \(\mathbb{E}_{A\sim\pi}[\nabla\log\pi(A\mid S)]=0\).
-  \item The second equality replaces the true advantage \(q^\pi(S,A)-v_b(S)\) by the TD‐based quantity \(\delta_v(S,A,S')\), which has the same expectation under the transition kernel \(P\).
+  \item The second equality replaces the true advantage \(q^\pi(S,A)-v_b(S)\) by the TD‐based quantity \(\delta_v(S,A,S')\), which has the same expectation under the transition matrix \(P\).
   \item Finally, we approximate the full expectation by a single sampled transition \((s,a,s')\), yielding a low‐variance stochastic gradient step in which the critic’s baseline and the actor’s gradient are combined in one update.
 \end{itemize}
 \subsection{Actor–Critic: Parametric Value Approximation}

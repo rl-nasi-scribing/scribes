@@ -1,0 +1,20 @@
+\section{Gradient Ascent}
+\label{sec:gradient_ascent}
+
+After specifying the explicit policy parameterization, we can now use the gradient ascent method to update the policy:
+\begin{equation}
+    \theta^{k+1} \;\leftarrow\; \theta^k \;+\; \alpha \,\nabla_\theta \,v_x(\theta)\big|_{\theta=\theta^k}
+\end{equation}
+
+Where:
+\begin{itemize}
+    \item k is the iteration index
+    \item $\theta^k$ is the parameter vector at iteration $k$.
+    \item $\alpha$ is the (positive) step size or learning rate. This usually becomes hyperparameter.
+    \item $\nabla_\theta v_x(\theta)$ is the gradient of the value function with respect to the parameter vector $\theta$ under some optimality criterion $x$ (e.g., discounted return, average reward, total reward)
+    \item $\theta^{k+1}$ is the updated parameter vector after applying the gradient ascent step
+\end{itemize}
+
+Now, the big question to get everything to be working is on how to find the $\nabla_\theta v_x(\theta)$. And this is going to be discussed in the next section.
+
+

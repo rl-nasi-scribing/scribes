@@ -3,7 +3,7 @@
 We now show in detail how a \emph{compatible} parametric critic yields both:
 \begin{itemize}
   \item an unbiased replacement for the true action‐value in the policy gradient, and
-  \item the \emph{natural} policy gradient as a by‐product.
+  \item the \emph{natural} policy gradient as a by‐product and it reduces the problem to regression.
 \end{itemize}
 
 \subsection*{1. Definition of the Compatible Critic}
@@ -55,7 +55,7 @@ we can write:
 \]
 That is, we can use \(\hat{q}_b^\pi(\cdot;w^*)\) directly in the gradient expression without introducing bias.
 
-\subsection*{4. Benefit 2: Emergence of the Natural Gradient}
+\subsection*{4. Benefit 2: Emergence of the Natural Gradient That Reduces The Problem To Regression}
 
 We observe that:
 \[
@@ -96,7 +96,7 @@ An actor–critic algorithm using compatible function approximation proceeds as 
   \]
 \end{enumerate}
 
-\subsection*{Final Notes}
+\subsection*{Additional Notes}
 
 \begin{itemize}
   \item The actor update 
