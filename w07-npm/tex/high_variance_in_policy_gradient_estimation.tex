@@ -1,0 +1,102 @@
+\section{High Variance in Policy Gradient Estimation}
+
+\subsection{Issue}
+The sample‐based estimator of the policy gradient is unbiased once the underlying Markov chain has sufficiently mixed. However, it often suffers from high variance because it draws randomness from two independent sources:
+\begin{itemize}
+  \item the initial state distribution, and
+  \item the stochastic nature of the policy.
+\end{itemize}
+Each of these contributes to the overall variance, which can slow or destabilize learning.
+
+\subsection{Variance Reduction Techniques}
+To reduce variance without introducing bias, two complementary approaches are widely used:
+
+\begin{enumerate}
+  \item \textbf{Baseline / Control Variate.}  
+    Add a baseline function that depends only on the state (not on the action).  
+    Subtracting this baseline from the action‐value estimate preserves unbiasedness while lowering variance.  
+    A common choice for the baseline is the state‐value function, leading to the notion of an advantage function.
+
+  \item \textbf{Actor–Critic Methods.}  
+    Introduce a parametric \emph{critic} that learns a value‐function approximation online (e.g.\ via temporal‐difference updates).  
+    The critic’s estimate serves as an adaptive baseline or advantage for the actor, further stabilizing and reducing the variance of the policy update.
+\end{enumerate}
+
+By combining a state‐dependent baseline with an actor–critic architecture, one can maintain unbiased gradient estimates while dramatically reducing estimator variance, thereby improving convergence speed and stability.
+\subsection{Baseline as a Control Variate and TD–Based Advantage Estimation}
+
+Building on the basic policy‐gradient theorem, we introduce a state‐dependent baseline \(v_b\) and show how to replace the true advantage by a one‐step TD error.  The handwritten notes give the following formulas:
+
+\paragraph{1. Policy‐Gradient with a Baseline}
+\[
+\nabla v_g(\theta)
+=
+\mathbb{E}\bigl[\{\,q^\pi(S,A)\;-\;v_b(S)\}\,\nabla_\theta\log\pi_\theta(A\mid S)\bigr]
+=
+\mathbb{E}\bigl[\delta_v(S,A,S')\,\nabla_\theta\log\pi_\theta(A\mid S)\bigr].
+\]
+
+\paragraph{2. Definition of the TD Error}
+\[
+\delta_v(s,a,s')
+=
+\mathbb{E}_{s'\sim P(\cdot\mid s,a)}
+\bigl[r(s,a)\;-\;v_b
+\;+\;v_b(s')
+\;-\;v_b(s)\;\bigm|\;s,a\bigr].
+\]
+
+\paragraph{3. Single‐Sample Approximation}
+\[
+\nabla v_g(\theta)
+\;\approx\;
+\delta_v(s,a,s')\,\nabla_\theta\log\pi_\theta(a\mid s)
+\quad\text{(using one sample of \((s,a,s')\)).}
+\]
+
+\paragraph{Explanation}
+\begin{itemize}
+  \item The first equality shows that subtracting \(v_b(S)\) from the action‐value \(q^\pi(S,A)\) does not introduce bias, because \(\mathbb{E}_{A\sim\pi}[\nabla\log\pi(A\mid S)]=0\).
+  \item The second equality replaces the true advantage \(q^\pi(S,A)-v_b(S)\) by the TD‐based quantity \(\delta_v(S,A,S')\), which has the same expectation under the transition kernel \(P\).
+  \item Finally, we approximate the full expectation by a single sampled transition \((s,a,s')\), yielding a low‐variance stochastic gradient step in which the critic’s baseline and the actor’s gradient are combined in one update.
+\end{itemize}
+\subsection{Actor–Critic: Parametric Value Approximation}
+
+Actor–Critic (AC) methods further reduce variance by introducing a \emph{parametric value approximator} (the \emph{critic}), at the cost of a small bias–variance trade‐off.  Let \(w\in\mathcal W\) denote the critic parameters.
+
+\paragraph{Critic as a State–Value Baseline}
+One can form a parametric baseline
+\[
+\hat v_b(s;w),
+\]
+which is then used inside the TD‐error
+\[
+\delta_v(s,a,s')
+\;=\;
+r(s,a)
+\;+\;\gamma\,\hat v_b(s';w)
+\;-\;\hat v_b(s;w)
+\]
+to approximate the advantage in the policy‐gradient update
+\[
+\nabla v_g(\theta)
+\;\approx\;
+\mathbb{E}\bigl[\delta_v(S,A,S')\,\nabla_\theta\log\pi_\theta(A\mid S)\bigr].
+\]
+Here we are \emph{combining} (1) the baseline control‐variate trick and (2) the actor–critic TD update.
+
+\paragraph{Critic as an Action–Value Approximator}
+Alternatively, one may learn a parametric action‐value critic
+\[
+\hat q_b(s,a;w),
+\]
+and plug it directly into the original policy‐gradient theorem:
+\[
+\nabla v_g(\theta)
+=
+\mathbb{E}\bigl[\{\hat q_b(S,A;w)\;-\;v_b(S)\}\,\nabla_\theta\log\pi_\theta(A\mid S)\bigr]
+\;\approx\;
+\mathbb{E}\bigl[\hat q_b(S,A;w)\,\nabla_\theta\log\pi_\theta(A\mid S)\bigr].
+\]
+In this form we apply only the actor–critic mechanism (no separate baseline subtraction).
+

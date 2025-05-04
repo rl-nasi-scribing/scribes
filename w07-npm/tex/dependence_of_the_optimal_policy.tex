@@ -1,0 +1,95 @@
+\section{Dependence of the Optimal Policy on the Initial State Distribution}
+
+We consider a Markov Decision Process (MDP)
+\[
+\bigl(\mathcal{S},\,\mathcal{A},\,P,\,r,\,\gamma,\,p^0\bigr),
+\]
+where
+\begin{itemize}
+  \item $\mathcal{S}$ is the finite set of states,
+  \item $\mathcal{A}$ is the finite set of actions,
+  \item $P(s' \mid s,a)$ is the transition kernel,
+  \item $r(s,a)$ (or $r(s)$) is the (possibly discounted) reward function,
+  \item $\gamma\in[0,1)$ is the discount factor,
+  \item $p^0$ is the distribution over the initial state $S_0\sim p^0$.
+\end{itemize}
+
+\subsection{State–Value and Action–Value Functions}
+For any (possibly stochastic) policy $\pi:\mathcal{S}\times\mathcal{A}\to[0,1]$, define:
+\[
+v^\pi(s) \;=\; \mathbb{E}\Bigl[\sum_{t=0}^\infty \gamma^t\,r(S_t,A_t)\,\Bigm|\,S_0=s,\,\pi\Bigr],
+\]
+\[
+q^\pi(s,a) \;=\; \mathbb{E}\Bigl[\sum_{t=0}^\infty \gamma^t\,r(S_t,A_t)\,\Bigm|\,S_0=s,\,A_0=a,\,\pi\Bigr].
+\]
+
+\subsection{Performance Objective}
+We measure policy performance by the expected start–state value under $p^0$:
+\[
+J(\pi)
+\;=\;
+\mathbb{E}_{S_0\sim p^0}\!\bigl[v^\pi(S_0)\bigr]
+\;=\;
+\sum_{s\in\mathcal{S}} p^0(s)\,v^\pi(s).
+\]
+The \emph{optimal policy} is then
+\[
+\pi^*(p^0)
+\;=\;
+\arg\max_{\pi}\;J(\pi)
+\;=\;
+\arg\max_{\pi}\;\mathbb{E}_{S_0\sim p^0}\!\bigl[v^\pi(S_0)\bigr].
+\]
+\textbf{Key point:} the optimizer $\pi^*(p^0)$ generally \emph{depends} on the choice of $p^0$.
+
+\subsection{State–Wise vs.\ Distribution–Averaged Optimality}
+
+\paragraph{1. State–Wise Optimality.}
+For each fixed initial state $s_0$, one can define a \emph{state–specific} optimal policy
+\[
+\pi^*_{s_0}
+\;=\;
+\arg\max_{\pi}\;v^\pi(s_0).
+\]
+This policy maximizes return when \emph{starting} exactly in $s_0$. However, it may perform poorly if the true start state differs.
+
+\paragraph{2. Distribution–Averaged Optimality.}
+When the start state is sampled from $p^0$, the relevant criterion is
+\[
+\bar\pi
+\;=\;
+\arg\max_{\pi}\;\mathbb{E}_{S_0\sim p^0}\!\bigl[v^\pi(S_0)\bigr].
+\]
+This $\bar\pi$ may sacrifice performance in unlikely start states to improve performance where $p^0$ places more mass.
+
+\subsection{Example: Two Initial Distributions}
+Let $\mathcal{S}=\{s_0,s_1,s_2,s_3\}$. Consider two different initial distributions:
+\[
+p^0_{(1)}
+=\begin{bmatrix}1 & 1 & 0 & 0\end{bmatrix}^\mathsf{T}, 
+\quad
+p^0_{(2)}
+=\begin{bmatrix}0 & 1 & 1 & 1\end{bmatrix}^\mathsf{T}.
+\]
+\begin{itemize}
+  \item Under $p^0_{(1)}$, only $s_0,s_1$ ever occur; the optimal policy $\pi^*(p^0_{(1)})$ will focus on maximizing $v^\pi(s_0)$ and $v^\pi(s_1)$.
+  \item Under $p^0_{(2)}$, the process starts in $s_1,s_2,s_3$; hence $\pi^*(p^0_{(2)})$ may differ substantially, since it can ignore $s_0$ entirely.
+\end{itemize}
+
+\subsection{Uniformly Optimal Policy}
+A policy is \emph{uniformly optimal} (or \emph{non–distributional}) if it maximizes $v^\pi(s)$ \emph{for every} $s\in\mathcal{S}$:
+\[
+\pi^{\mathrm{uni}}
+\;=\;
+\arg\max_{\pi}\;\min_{s\in\mathcal{S}} v^\pi(s).
+\]
+Such a policy does not depend on $p^0$, but need not exist unless the MDP admits a single policy that is simultaneously optimal in all start states.
+
+\bigskip
+\textbf{Conclusion.}  
+The optimal policy for an MDP is \emph{not} unique in general and \emph{varies} with the initial state distribution $p^0$, unless a uniformly optimal policy exists. Hence, when designing or evaluating algorithms, one must specify (or be aware of) the assumed $p^0$ under which optimality is judged.
+
+
+
+
+

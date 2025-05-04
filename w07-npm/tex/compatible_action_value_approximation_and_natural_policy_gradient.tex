@@ -1,0 +1,123 @@
+\section{Compatible Action Value Approximation and Natural Policy Gradient}
+
+We now show in detail how a \emph{compatible} parametric critic yields both:
+\begin{itemize}
+  \item an unbiased replacement for the true action‐value in the policy gradient, and
+  \item the \emph{natural} policy gradient as a by‐product.
+\end{itemize}
+
+\subsection*{1. Definition of the Compatible Critic}
+
+Let the critic be parameterized by \( w \in \mathcal{W} \) as:
+\[
+\hat{q}_b^\pi(s,a;w) \doteq w^\top f_\theta(s,a),
+\]
+where the feature vector is defined as:
+\[
+f_\theta(s,a) \doteq \nabla_\theta \log \pi_\theta(a \mid s),
+\]
+which satisfies the \emph{compatibility condition}, namely:
+\[
+\nabla_w \hat{q}_b^\pi(s,a;w) = f_\theta(s,a).
+\]
+This ensures that the critic is \emph{linear in the parameters} \(w\), with features aligned to the policy gradient.
+
+\subsection*{2. Mean‐Squared Error (MSE) Objective}
+
+We fit \(w\) by minimizing the MSE between the approximated and true action-values:
+\[
+e_{\text{MS}}^q(w) \doteq \mathbb{E}\left[\left(\hat{q}_b^\pi(S,A;w) - q_b^\pi(S,A)\right)^2\right].
+\]
+The optimal \(w^*\) satisfies the stationary condition:
+\[
+\nabla_w e_{\text{MS}}^q(w^*) = 0,
+\]
+which implies:
+\[
+\mathbb{E}\left[(\hat{q}_b^\pi(S,A;w^*) - q_b^\pi(S,A)) f_\theta(S,A)\right] = 0.
+\]
+Thus, the regression error is orthogonal to the feature vector \(f_\theta\).
+
+\subsection*{3. Benefit 1: Unbiased Advantage Replacement}
+
+From the policy gradient theorem:
+\[
+\nabla_\theta v_g(\theta) = \mathbb{E}\left[q_b^\pi(S,A)\, f_\theta(S,A)\right],
+\]
+and using the orthogonality condition:
+\[
+\mathbb{E}\left[(\hat{q}_b^\pi(S,A;w^*) - q_b^\pi(S,A)) f_\theta(S,A)\right] = 0,
+\]
+we can write:
+\[
+\nabla_\theta v_g(\theta) 
+= \mathbb{E}\left[\hat{q}_b^\pi(S,A;w^*) f_\theta(S,A)\right].
+\]
+That is, we can use \(\hat{q}_b^\pi(\cdot;w^*)\) directly in the gradient expression without introducing bias.
+
+\subsection*{4. Benefit 2: Emergence of the Natural Gradient}
+
+We observe that:
+\[
+\mathbb{E}\left[\hat{q}_b^\pi(S,A;w^*) f_\theta(S,A)\right]
+= \mathbb{E}\left[w^{*\top} f_\theta(S,A) f_\theta(S,A)\right]
+= \Phi w^*,
+\]
+where:
+\[
+\Phi \doteq \mathbb{E}\left[f_\theta(S,A) f_\theta(S,A)^\top\right]
+\]
+is the \emph{Fisher information matrix} of the policy.
+
+Thus:
+\[
+\Phi w^* = \nabla_\theta v_g(\theta)
+\quad \Rightarrow \quad
+w^* = \Phi^{-1} \nabla_\theta v_g(\theta).
+\]
+
+This reveals that \(w^*\), learned from regression, is equal to the natural gradient vector. In practice, this leads to the following actor update:
+
+\[
+\theta \gets \theta + \alpha \, w^*,
+\quad \text{or equivalently} \quad
+\theta \gets \theta + \alpha \, \Phi^{-1} \nabla_\theta v_g(\theta),
+\]
+where \(w^*\) serves as the preconditioned gradient direction and \(\Phi^{-1}\) acts as a conditioning matrix.
+
+\subsection*{5. Actor–Critic Update Summary}
+
+An actor–critic algorithm using compatible function approximation proceeds as follows:
+\begin{enumerate}
+  \item \textbf{Critic step:} Regress \(\hat{q}_b^\pi(s,a;w)\) toward the true \(q_b^\pi(s,a)\), minimizing \(e_{\text{MS}}^q(w)\), and obtain \(w^*\).
+  \item \textbf{Actor step:} Update the policy using:
+  \[
+  \theta \gets \theta + \alpha \, w^*.
+  \]
+\end{enumerate}
+
+\subsection*{Final Notes}
+
+\begin{itemize}
+  \item The actor update 
+  \[
+    \theta \;\gets\;\theta + \alpha\,w^*
+  \]
+  is \emph{agnostic to the specific policy parameterization}, because \(w^*\) comes from a simple linear regression problem on the critic.
+
+  \item In general one may write a preconditioned gradient step as
+  \[
+    \theta \;\gets\;\theta + \alpha\,C\,\nabla_\theta v_g(\theta),
+  \]
+  where \(C\) is any symmetric positive‐definite matrix.  
+  \begin{itemize}
+    \item For \emph{vanilla} policy gradient, \(C = I\).  
+    \item Here, by compatible function approximation, \(C = \Phi^{-1}\), so that 
+    \[
+      w^* = \Phi^{-1}\,\nabla_\theta v_g(\theta).
+    \]
+  \end{itemize}
+
+  \item Using \(C=\Phi^{-1}\) (the \emph{natural gradient}) yields \textbf{faster convergence} in parameter space and \textbf{lower sample complexity} than the unconditioned update \(C=I\).
+\end{itemize}
+
